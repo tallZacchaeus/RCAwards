@@ -1,6 +1,6 @@
 # Redemption City Award of Excellence 2026 — Build Plan
 
-_Powered by City Breed · 4th Edition · Event: Thursday, 31 July 2026_
+_Powered by City Breed · 4th Edition · Event: Wednesday, 29 July 2026_
 
 ## 1. What we're building
 
@@ -58,10 +58,10 @@ Field types to support: `short_text`, `paragraph`, `multiple_choice`, `dropdown`
 
 ## 3a. Design & motion system (the "outstanding front-facing site")
 
-**Visual target:** the polish you'd see in award-winning Dribbble / Webflow / Framer showcases — editorial layout, generous whitespace, cinematic dark-luxury palette, large display type, tasteful gold accents and grain/texture. Build on the existing tokens from `Redemption City Awards.dc.html`:
+**Visual target:** the polish you'd see in award-winning Dribbble / Webflow / Framer showcases — editorial layout, generous whitespace, cinematic dark-luxury palette, large display type, tasteful gold accents and grain/texture. The full, locked design system lives in [`docs/brand.md`](docs/brand.md) (colors + fonts are constant every edition, taken from the official flyer):
 
-- **Palette:** near-black `#0A0807`, warm gold `#C9A24B` → highlight `#F8E7A1`, muted bronze `#8C6A1F`.
-- **Type:** Playfair Display (display), Cormorant Garamond (accent/serif), Manrope (UI/body) — served via `next/font` (zero layout shift).
+- **Palette:** near-black `#0A0807`, primary gold `#C9A24B`, bright `#D4AF37`, champagne highlight `#F8E7A1`, deep bronze `#8C6A1F`; signature metallic gradient for the wordmark.
+- **Type:** **Cinzel** (display caps — the "AWARDS OF EXCELLENCE" wordmark & titles), Playfair Display (editorial headlines & date lockup), Cormorant Garamond (accent serif), Manrope (UI/body) — all served via `next/font` (zero layout shift).
 - **Texture:** subtle film grain, soft gold light-bloom, thin metallic rules — already prototyped in the HTML's keyframes.
 
 **Motion principles (story-like, not gratuitous):**
@@ -121,7 +121,7 @@ Each is seeded as a JSON form definition extracted from `2026 Content For Award 
 - Auth (admin/judge); admin nomination listing + status; scoring; exports.
 
 **Phase 3 — Marketing site (merged design + motion)**
-- Build the narrative-scroll page: Hero, B.R.E.E.D. pillars, About the Award, Objectives, How-to-Nominate steps, Categories showcase, Past Winners gallery, Countdown to 31 July 2026, Sponsors, FAQ, newsletter signup, footer.
+- Build the narrative-scroll page: Hero, B.R.E.E.D. pillars, About the Award, Objectives, How-to-Nominate steps, Categories showcase, Past Winners gallery, Countdown to 29 July 2026, Sponsors, FAQ, newsletter signup, footer.
 - Generate hero / category / spotlight sections with **21st Magic MCP**, then hand-tune to the brand.
 - Layer **GSAP ScrollTrigger** beats (pinned sections, staggered reveals, parallax, count-up countdown) + **Lenis** smooth scroll. Keep to the Phase-0 motion principles.
 - **Performance pass against the §3a budget** before moving on (Lighthouse ≥ 90 mobile, LCP < 2.0s, CLS ~0).
