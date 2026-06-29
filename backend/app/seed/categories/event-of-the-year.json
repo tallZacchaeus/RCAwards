@@ -1,0 +1,54 @@
+{
+  "slug": "event-of-the-year",
+  "name": "Event of the Year",
+  "group": "city",
+  "edition_year": 2026,
+  "sort_order": 7,
+  "voting_enabled": true,
+  "description": "This nomination is for an outstanding event within Redemption City that demonstrated excellence in quality, creativity, and organisational execution, leaving a lasting impression on its audience and making a measurable contribution to its intended cause or purpose.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true},
+        {"key": "event_name", "label": "Name of the Event", "type": "short_text", "required": true},
+        {"key": "organising_body", "label": "Organising Body/Organisation", "type": "short_text", "required": true}
+      ]
+    },
+    {
+      "title": "Purpose and Objectives",
+      "fields": [
+        {"key": "purpose_text", "label": "What was the main goal of the event? Was it achieved? Provide a brief overview of the event's purpose.", "type": "paragraph", "required": true},
+        {"key": "purpose_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Audience Engagement and Participation",
+      "fields": [
+        {"key": "engagement_text", "label": "Describe how the event engaged its audience. Was it interactive, inclusive, and well-attended?", "type": "paragraph", "required": true},
+        {"key": "engagement_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Creativity and Innovation",
+      "fields": [
+        {"key": "creativity_text", "label": "What made the event unique? Were there any creative themes, concepts, or formats used?", "type": "paragraph", "required": true}
+      ]
+    },
+    {
+      "title": "Execution and Planning Excellence",
+      "fields": [
+        {"key": "execution_text", "label": "Evaluate the organisation, logistics, and overall delivery of the event. Was it smooth and professionally managed?", "type": "paragraph", "required": false},
+        {"key": "execution_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Impact and Outcomes",
+      "fields": [
+        {"key": "impact_text", "label": "Share any measurable or noticeable outcome of the event (e.g. funds raised, people impacted, awareness created, lasting effects).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

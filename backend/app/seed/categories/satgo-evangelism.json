@@ -1,0 +1,47 @@
+{
+  "slug": "satgo-evangelism",
+  "name": "SATGO – Evangelism Youth Province Impact Award",
+  "group": "satgo",
+  "edition_year": 2026,
+  "sort_order": 21,
+  "voting_enabled": false,
+  "description": "This award recognises a Youth Province that has demonstrated exceptional commitment to evangelism, soul winning, discipleship, and community outreach through consistent and impactful evangelistic initiatives.",
+  "sections": [
+    {
+      "title": "Nominator Information",
+      "fields": [
+        {"key": "nominator_full_name", "label": "Full Name", "type": "short_text", "required": true},
+        {"key": "nominator_contact", "label": "Phone Number / Email Address", "type": "short_text", "required": true},
+        {"key": "relationship", "label": "Relationship With Youth Province", "type": "multiple_choice", "required": true, "allow_other": true,
+          "options": ["Youth Province Leader", "Pastor", "Member", "Partner", "Other"]}
+      ]
+    },
+    {
+      "title": "Youth Province Details",
+      "fields": [
+        {"key": "province_name", "label": "Name of Youth Province", "type": "short_text", "required": true},
+        {"key": "province_leader", "label": "Youth Province Pastor/Leader", "type": "short_text", "required": true},
+        {"key": "contact_info", "label": "Contact Information", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Evaluation Criteria",
+      "fields": [
+        {"key": "evangelism_strategy", "label": "Describe the evangelism initiatives carried out by the Youth Province within the last year (outreach programs, campus evangelism, community missions, digital evangelism).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "souls_won", "label": "Provide evidence of souls reached, saved, and transformed through these efforts.", "type": "paragraph", "required": true},
+        {"key": "followup_system", "label": "Describe how new converts are followed up, discipled, and integrated.", "type": "paragraph", "required": true},
+        {"key": "community_outreach", "label": "How has the Youth Province positively impacted its surrounding community?", "type": "paragraph", "required": true},
+        {"key": "consistency_growth", "label": "Describe the consistency and growth of evangelism activities.", "type": "paragraph", "required": true}
+      ]
+    },
+    {
+      "title": "Impact Data",
+      "fields": [
+        {"key": "num_activities", "label": "Number of Evangelism Activities in the Past Year", "type": "dropdown", "required": true, "options": ["0–5", "6–10", "11–20", "20+"]},
+        {"key": "souls_reached", "label": "Estimated Souls Reached", "type": "dropdown", "required": true, "options": ["Below 100", "100–500", "500–1000", "1000+"]},
+        {"key": "followup_converts", "label": "Number of Follow-Up Converts", "type": "dropdown", "required": true, "options": ["Below 50", "50–200", "200+"]},
+        {"key": "evidence_upload", "label": "Evidence Upload (evangelism reports, testimonies, photos, videos, outreach records)", "type": "file_upload", "required": false, "accept": ["image/*", "video/*", "application/pdf"]}
+      ]
+    }
+  ]
+}

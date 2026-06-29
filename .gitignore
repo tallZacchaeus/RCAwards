@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Local databases / verification artifacts
+*.db
+*.sqlite3
+
+# Environment / secrets
+.env
+.env.local
+*.local
+
+# Node / frontend (Phase 0/3)
+node_modules/
+.next/
+out/
+dist/
+.turbo/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Source content docs (kept locally, not committed — see docs/README)
+*.docx

@@ -1,0 +1,48 @@
+{
+  "slug": "inspirational-leader",
+  "name": "Inspirational Leader of the Year (Male & Female)",
+  "group": "city",
+  "edition_year": 2026,
+  "sort_order": 3,
+  "voting_enabled": true,
+  "description": "This nomination is for an individual who has consistently demonstrated leadership, integrity, service, mentorship, and impact within Redemption City; someone who embodies humility, influence, and transformation in their work or ministry.",
+  "sections": [
+    {
+      "title": "Your Information (Nominator)",
+      "fields": [
+        {"key": "nominator_full_name", "label": "Your Full Name", "type": "short_text", "required": true},
+        {"key": "nominator_contact", "label": "Your Phone Number / Email Address", "type": "short_text", "required": true},
+        {"key": "relationship", "label": "Your Relationship with the Nominee", "type": "multiple_choice", "required": true, "allow_other": true,
+          "options": ["Team Member / Staff", "Mentee / Youth", "Colleague / Department Member", "Volunteer / Church Member", "Other (please specify)"]},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true}
+      ]
+    },
+    {
+      "title": "Nominee Information",
+      "fields": [
+        {"key": "nominee_full_name", "label": "Full Name of the Nominee", "type": "short_text", "required": true},
+        {"key": "nominee_gender", "label": "Gender of the Nominee", "type": "multiple_choice", "required": true, "options": ["Male", "Female"]},
+        {"key": "nominee_role", "label": "Nominee's Position / Role (if known)", "type": "short_text", "required": false},
+        {"key": "area_of_impact", "label": "Department / Area of Impact", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Evaluation Criteria",
+      "description": "Rate from 1 to 10 (1 = Poor, 10 = Excellent).",
+      "fields": [
+        {"key": "consistency", "label": "Consistency in leadership and service", "type": "linear_scale_1_10", "required": true},
+        {"key": "transformational_impact", "label": "Transformational impact in their role/ministry", "type": "linear_scale_1_10", "required": true},
+        {"key": "mentorship", "label": "Mentorship and influence on others", "type": "linear_scale_1_10", "required": true},
+        {"key": "spiritual_integrity", "label": "Spiritual integrity and alignment with RCCG values", "type": "linear_scale_1_10", "required": true},
+        {"key": "endorsements", "label": "Testimonies or endorsements from others", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Story & Evidence",
+      "fields": [
+        {"key": "why_inspires", "label": "Briefly share why this person inspires you (a short story or reason)", "type": "paragraph", "required": false},
+        {"key": "supporting_file", "label": "Upload a photo, testimonial, or supporting evidence", "type": "file_upload", "required": false, "accept": ["image/*", "application/pdf"]}
+      ]
+    }
+  ]
+}

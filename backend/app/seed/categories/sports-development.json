@@ -1,0 +1,48 @@
+{
+  "slug": "sports-development",
+  "name": "Best RCCG Region – Sports Development",
+  "group": "regional",
+  "edition_year": 2026,
+  "sort_order": 11,
+  "voting_enabled": true,
+  "description": "This award honours an RCCG Region that has significantly promoted sports and physical wellness as a tool for youth engagement, discipline, unity, and holistic development.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_region", "label": "Do you reside in Redemption City or an RCCG Region?", "type": "yes_no", "required": true},
+        {"key": "region_name", "label": "Nominated RCCG Region", "type": "short_text", "required": true},
+        {"key": "coordinator_contact", "label": "Region Pastor/Sports Coordinator's Contact (if known)", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Organization of Sports Events",
+      "fields": [
+        {"key": "events_text", "label": "In less than 200 words, describe the types, frequency, and scale of sports programs organized by the region (e.g. youth tournaments, fitness weekends, sport outreaches).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "events_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Impact on Youth Engagement",
+      "fields": [
+        {"key": "impact_text", "label": "In less than 200 words, explain how the sports initiatives have impacted the lives of young people spiritually, mentally, or socially.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Leadership & Team Development",
+      "fields": [
+        {"key": "leadership_text", "label": "In less than 200 words, describe how the region uses sports to develop leadership, teamwork, discipline, and mentorship among youths.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "leadership_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Inclusiveness & Talent Discovery",
+      "fields": [
+        {"key": "inclusiveness_text", "label": "In less than 200 words, describe how the region includes diverse youth groups in sports and any success stories in talent discovery or development.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "inclusiveness_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

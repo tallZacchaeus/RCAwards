@@ -1,0 +1,48 @@
+{
+  "slug": "business-owner-of-the-year",
+  "name": "Business Owner of the Year",
+  "group": "city",
+  "edition_year": 2026,
+  "sort_order": 4,
+  "voting_enabled": true,
+  "description": "This nomination is for a business owner or entrepreneur who has made a significant contribution to Redemption City's growth through job creation, innovation, human capital development, or mentorship, and whose impact extends well beyond commercial success.",
+  "sections": [
+    {
+      "title": "Nominator's Information",
+      "fields": [
+        {"key": "nominator_full_name", "label": "Your Full Name", "type": "short_text", "required": true},
+        {"key": "nominator_contact", "label": "Your Phone Number or Email Address", "type": "short_text", "required": true},
+        {"key": "relationship", "label": "Your Relationship to the Nominee", "type": "multiple_choice", "required": true, "allow_other": true,
+          "options": ["Employee or Former Employee", "Business Partner", "Customer/Client", "Community Member", "Other (please specify)"]},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true}
+      ]
+    },
+    {
+      "title": "Nominee's Information",
+      "fields": [
+        {"key": "owner_full_name", "label": "Full Name of Business Owner", "type": "short_text", "required": true},
+        {"key": "business_name", "label": "Name of Business or Enterprise", "type": "short_text", "required": true},
+        {"key": "business_location", "label": "Business Location (Area within Redemption City)", "type": "short_text", "required": true},
+        {"key": "years_active", "label": "How long has this business been active in Redemption City?", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Evaluation Criteria",
+      "description": "Rate from 1 to 10 (1 = Poor, 10 = Excellent).",
+      "fields": [
+        {"key": "people_empowered", "label": "Number of people employed, trained, or empowered", "type": "linear_scale_1_10", "required": true},
+        {"key": "innovation", "label": "Innovation and problem-solving approach", "type": "linear_scale_1_10", "required": true},
+        {"key": "community_commitment", "label": "Sustained presence and commitment to the community", "type": "linear_scale_1_10", "required": true},
+        {"key": "social_spiritual_growth", "label": "Contribution to social or spiritual growth of workers/community", "type": "linear_scale_1_10", "required": true},
+        {"key": "youth_mentorship", "label": "Mentorship or support to youth/aspiring entrepreneurs", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Supporting Input",
+      "fields": [
+        {"key": "why_deserve", "label": "Why do you believe this business owner deserves this award?", "type": "paragraph", "required": false},
+        {"key": "supporting_file", "label": "Upload supporting media or testimonials", "type": "file_upload", "required": false, "accept": ["image/*", "application/pdf"]}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "slug": "agricultural-innovation",
+  "name": "Best RCCG Region – Agricultural Innovation",
+  "group": "regional",
+  "edition_year": 2026,
+  "sort_order": 12,
+  "voting_enabled": true,
+  "description": "This award recognises the RCCG Region that has most significantly contributed to agricultural development through innovative projects, food security efforts, agribusiness empowerment, and community farming initiatives.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_region", "label": "Do you reside in Redemption City or an RCCG Region?", "type": "yes_no", "required": true},
+        {"key": "region_name", "label": "Nominated RCCG Region", "type": "short_text", "required": true},
+        {"key": "coordinator_contact", "label": "Region Pastor/Agricultural Coordinator's Contact (if known)", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Innovative Agricultural Projects",
+      "fields": [
+        {"key": "projects_text", "label": "In less than 200 words, describe any unique or innovative agricultural initiatives driven by the region (e.g. greenhouses, irrigation systems, vertical farming, organic production).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "projects_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Youth & Community Empowerment",
+      "fields": [
+        {"key": "empowerment_text", "label": "In less than 200 words, explain how the region has used agriculture to empower youth and community members with skills, tools, or opportunities for self-reliance.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "empowerment_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Sustainability & Food Security Impact",
+      "fields": [
+        {"key": "sustainability_text", "label": "In less than 200 words, describe how the region's agricultural programs contribute to food security, sustainability, or poverty alleviation.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "sustainability_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Scale & Growth of Agricultural Initiatives",
+      "fields": [
+        {"key": "scale_text", "label": "In less than 200 words, describe the reach and scalability of the region's agricultural activities (e.g. multiple farms, church-wide cooperatives, partnerships, or rural expansion).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "scale_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

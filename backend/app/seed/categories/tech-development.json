@@ -1,0 +1,55 @@
+{
+  "slug": "tech-development",
+  "name": "Tech Development of the Year",
+  "group": "regional",
+  "edition_year": 2026,
+  "sort_order": 9,
+  "voting_enabled": true,
+  "description": "This award celebrates innovation, creativity, and impact in technology. Nominate a tech solution (product, platform, app, software, hardware, or system) that has demonstrated excellence in development, problem-solving, and user experience while creating measurable value in its domain.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true},
+        {"key": "product_name", "label": "Name of the Tech Product/Project", "type": "short_text", "required": true},
+        {"key": "developer_name", "label": "Developer/Organisation Name", "type": "short_text", "required": true}
+      ]
+    },
+    {
+      "title": "Problem Solving and Relevance",
+      "fields": [
+        {"key": "problem_text", "label": "What problem does this tech product solve? Why is it relevant and important?", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "problem_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Innovation and Uniqueness",
+      "fields": [
+        {"key": "innovation_text", "label": "What makes this technology stand out? Was there a creative or unique approach to the development?", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "innovation_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Functionality and User Experience",
+      "fields": [
+        {"key": "ux_text", "label": "Is the product easy to use, accessible, and well-designed? Has it received positive feedback from users?", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "ux_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Impact and Results",
+      "fields": [
+        {"key": "impact_text", "label": "How has the technology made a difference? Share measurable outcomes, social or economic benefits, or growth statistics.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Scalability and Future Potential",
+      "fields": [
+        {"key": "scalability_text", "label": "Can this technology be scaled to reach more people or solve broader problems? Is it sustainable or future-ready?", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "scalability_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "_note": "Per the PFO directive, every Departmental Impact award uses the SAME form and the same five criteria. The seed loader expands this template into one category per department, so uniformity is guaranteed by construction.",
+  "group": "departmental",
+  "voting_enabled": false,
+  "sort_order_start": 13,
+  "criteria": [
+    {"key": "leadership", "label": "Leadership"},
+    {"key": "integrity", "label": "Integrity"},
+    {"key": "problem_solving", "label": "Problem Solving"},
+    {"key": "collaboration", "label": "Collaboration & Team Spirit"},
+    {"key": "impact_value", "label": "Impact and Value to the Department"}
+  ],
+  "departments": [
+    {"slug": "sanitation", "name": "Sanitation Department"},
+    {"slug": "water", "name": "Water Department"},
+    {"slug": "health", "name": "Health Department"},
+    {"slug": "environmental-health", "name": "Environmental Health Department"},
+    {"slug": "maintenance", "name": "Maintenance Department"},
+    {"slug": "electronics", "name": "Electronics Department"},
+    {"slug": "transport", "name": "Transport Department"},
+    {"slug": "security", "name": "Security Department"}
+  ]
+}

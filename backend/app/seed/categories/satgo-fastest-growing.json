@@ -1,0 +1,47 @@
+{
+  "slug": "satgo-fastest-growing",
+  "name": "SATGO – Fastest Growing Youth Province Award",
+  "group": "satgo",
+  "edition_year": 2026,
+  "sort_order": 22,
+  "voting_enabled": false,
+  "description": "This award recognises a Youth Province that has experienced remarkable growth through spiritual development, youth engagement, leadership expansion, and innovative ministry approaches.",
+  "sections": [
+    {
+      "title": "Nominator Information",
+      "fields": [
+        {"key": "nominator_full_name", "label": "Full Name", "type": "short_text", "required": true},
+        {"key": "nominator_contact", "label": "Phone Number / Email Address", "type": "short_text", "required": true},
+        {"key": "affiliated", "label": "Are you affiliated with an RCCG Youth Province?", "type": "yes_no", "required": true},
+        {"key": "relationship", "label": "Relationship With Youth Province", "type": "multiple_choice", "required": true, "allow_other": true,
+          "options": ["Youth Province Leader", "Pastor", "Member", "Partner", "Other"]}
+      ]
+    },
+    {
+      "title": "Youth Province Details",
+      "fields": [
+        {"key": "province_name", "label": "Youth Province Name", "type": "short_text", "required": true},
+        {"key": "province_leader", "label": "Youth Province Leader", "type": "short_text", "required": true},
+        {"key": "year_established", "label": "Year Established", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Growth Evaluation",
+      "fields": [
+        {"key": "numerical_growth", "label": "Describe the growth in membership, attendance, and participation.", "type": "paragraph", "required": true},
+        {"key": "ministry_expansion", "label": "Describe new departments, initiatives, branches, or programs created.", "type": "paragraph", "required": true},
+        {"key": "youth_engagement", "label": "How has the Youth Province increased youth participation and involvement?", "type": "paragraph", "required": true},
+        {"key": "leadership_development", "label": "Describe how new leaders are identified, trained, and deployed.", "type": "paragraph", "required": true},
+        {"key": "sustainability", "label": "What structures ensure continued growth?", "type": "paragraph", "required": true}
+      ]
+    },
+    {
+      "title": "Impact Data",
+      "fields": [
+        {"key": "current_membership", "label": "Current Youth Province Membership", "type": "dropdown", "required": true, "options": ["Below 100", "100–500", "500–1000", "1000+"]},
+        {"key": "growth_percentage", "label": "Growth Percentage in Last 12 Months", "type": "dropdown", "required": true, "options": ["0–10%", "10–30%", "30–50%", "Above 50%"]},
+        {"key": "evidence_upload", "label": "Evidence Upload (attendance records, reports, photos, testimonials)", "type": "file_upload", "required": false, "accept": ["image/*", "application/pdf"]}
+      ]
+    }
+  ]
+}

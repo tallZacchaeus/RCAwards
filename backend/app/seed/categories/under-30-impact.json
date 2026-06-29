@@ -1,0 +1,48 @@
+{
+  "slug": "under-30-impact",
+  "name": "Under-30 Impact Person of the Year",
+  "group": "city",
+  "edition_year": 2026,
+  "sort_order": 5,
+  "voting_enabled": true,
+  "description": "This nomination is for a young individual under the age of 30 who has made a significant contribution to their field or community, demonstrating innovation, leadership, and purpose-driven impact.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Enter your valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true},
+        {"key": "nominee_full_name", "label": "Full name of the young individual (Under 30) you wish to nominate", "type": "short_text", "required": true},
+        {"key": "nominee_phone", "label": "Nominee's Phone Number", "type": "phone", "required": false}
+      ]
+    },
+    {
+      "title": "Impact in Community or Field",
+      "fields": [
+        {"key": "impact_text", "label": "In less than 200 words, explain how the nominee has made a meaningful impact in their community or field of endeavour.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "impact_rating", "label": "Rate the nominee's impact", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Innovation & Initiative",
+      "fields": [
+        {"key": "innovation_text", "label": "In less than 200 words, describe the nominee's innovation, creativity, or bold initiative that sets them apart.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "innovation_rating", "label": "Rate the nominee's level of innovation", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Leadership & Influence",
+      "fields": [
+        {"key": "leadership_text", "label": "In less than 200 words, explain how the nominee has demonstrated leadership or inspired others.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "leadership_rating", "label": "Rate the nominee's leadership and influence", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Professionalism & Character",
+      "fields": [
+        {"key": "character_text", "label": "In less than 200 words, describe the nominee's personal or professional character and how it supports their impact.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "character_rating", "label": "Rate the nominee's character and professionalism", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

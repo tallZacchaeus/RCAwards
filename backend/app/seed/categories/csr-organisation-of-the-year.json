@@ -1,0 +1,47 @@
+{
+  "slug": "csr-organisation-of-the-year",
+  "name": "CSR Organisation of the Year",
+  "group": "city",
+  "edition_year": 2026,
+  "sort_order": 6,
+  "voting_enabled": true,
+  "description": "This nomination is for an organisation that has demonstrated exceptional leadership in Corporate Social Responsibility; one that goes beyond compliance to drive impactful initiatives, responsible business practices, and measurable contributions to society and the environment.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true},
+        {"key": "organisation_name", "label": "Nominee Organisation Name", "type": "short_text", "required": true}
+      ]
+    },
+    {
+      "title": "CSR Strategy and Integration",
+      "fields": [
+        {"key": "strategy_text", "label": "Describe how the organisation has integrated CSR into its core business strategy. What long-term goals or values drive their CSR efforts?", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "strategy_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Social Impact and Community Development",
+      "fields": [
+        {"key": "impact_text", "label": "Explain how the organisation's CSR initiatives have directly impacted Redemption City (healthcare, education, employment, etc.).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Transparency and Accountability",
+      "fields": [
+        {"key": "transparency_text", "label": "Describe how the organisation communicates and reports its CSR efforts (annual reports, impact assessments, stakeholder involvement).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "transparency_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Innovation in CSR",
+      "fields": [
+        {"key": "innovation_text", "label": "Highlight any creative or innovative approaches the organisation has used to address social or environmental challenges.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "innovation_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

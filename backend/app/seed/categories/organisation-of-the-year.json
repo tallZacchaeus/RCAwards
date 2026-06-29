@@ -1,0 +1,48 @@
+{
+  "slug": "organisation-of-the-year",
+  "name": "Organisation of the Year",
+  "group": "city",
+  "edition_year": 2026,
+  "sort_order": 2,
+  "voting_enabled": true,
+  "description": "This nomination is for an organisation that has demonstrated excellence in service delivery, innovation, staff development, and community engagement within Redemption City.",
+  "sections": [
+    {
+      "title": "Nominator Information",
+      "fields": [
+        {"key": "nominator_full_name", "label": "Your Full Name", "type": "short_text", "required": true},
+        {"key": "nominator_contact", "label": "Your Phone Number or Email Address", "type": "short_text", "required": true},
+        {"key": "affiliation", "label": "Your Affiliation to the Organisation", "type": "multiple_choice", "required": true, "allow_other": true,
+          "options": ["Church Member", "Partner/Contractor", "Customer/Clientele", "Other (please specify)"]},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true}
+      ]
+    },
+    {
+      "title": "Nominee Organisation Information",
+      "fields": [
+        {"key": "organisation_name", "label": "Name of the Organisation Being Nominated", "type": "short_text", "required": true},
+        {"key": "primary_location", "label": "Primary Location/Office", "type": "short_text", "required": true},
+        {"key": "organisation_type", "label": "Type of Organisation", "type": "dropdown", "required": true,
+          "options": ["Business/Enterprise", "NGO/Charity", "Church-based Initiative", "Educational Institution", "Government/Parastatal", "Other"]}
+      ]
+    },
+    {
+      "title": "Evaluation Criteria",
+      "description": "Rate from 1 to 10 (1 = Poor, 10 = Excellent).",
+      "fields": [
+        {"key": "service_delivery", "label": "Growth and excellence in service delivery", "type": "linear_scale_1_10", "required": true},
+        {"key": "staff_welfare", "label": "Staff welfare and development efforts", "type": "linear_scale_1_10", "required": true},
+        {"key": "economic_social_dev", "label": "Contribution to economic or social development in Redemption City", "type": "linear_scale_1_10", "required": true},
+        {"key": "innovation", "label": "Innovation in products, services, or systems", "type": "linear_scale_1_10", "required": true},
+        {"key": "community_engagement", "label": "Community or church engagement", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Additional Info",
+      "fields": [
+        {"key": "why_deserve", "label": "Briefly explain why this organisation deserves this award", "type": "paragraph", "required": false},
+        {"key": "supporting_file", "label": "Upload any supporting documentation or photos", "type": "file_upload", "required": false, "accept": ["image/*", "application/pdf"]}
+      ]
+    }
+  ]
+}

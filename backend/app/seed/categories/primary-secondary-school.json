@@ -1,0 +1,55 @@
+{
+  "slug": "primary-secondary-school",
+  "name": "Primary or Secondary School of the Year",
+  "group": "city",
+  "edition_year": 2026,
+  "sort_order": 8,
+  "voting_enabled": true,
+  "description": "This award honours a school that has demonstrated excellence in academics, innovation, character development, and community impact; a school that provides a well-rounded, transformative experience for students and sets an example for others.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_city", "label": "Do you reside in Redemption City?", "type": "yes_no", "required": true},
+        {"key": "school_name", "label": "Name of the School", "type": "short_text", "required": true},
+        {"key": "school_level", "label": "School Level", "type": "multiple_choice", "required": true, "options": ["Primary", "Secondary"]}
+      ]
+    },
+    {
+      "title": "Academic Excellence",
+      "fields": [
+        {"key": "academic_text", "label": "Describe the school's academic achievements, results, and standards. Mention any awards, outstanding performances, or student success stories.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "academic_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Innovation in Learning",
+      "fields": [
+        {"key": "innovation_text", "label": "Has the school adopted any creative teaching methods, digital learning tools, or unique programs that improve learning outcomes?", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "innovation_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Character and Values Development",
+      "fields": [
+        {"key": "character_text", "label": "How does the school instill discipline, integrity, leadership, and other core values in students?", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "character_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Co-curricular Activities and Student Engagement",
+      "fields": [
+        {"key": "cocurricular_text", "label": "Highlight achievements in sports, music, arts, clubs, or community service by students or the school.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "cocurricular_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Community and Parental Involvement",
+      "fields": [
+        {"key": "community_text", "label": "Describe how the school engages parents and contributes to the local community.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "community_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

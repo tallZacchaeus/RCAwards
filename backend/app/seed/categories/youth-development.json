@@ -1,0 +1,48 @@
+{
+  "slug": "youth-development",
+  "name": "Best RCCG Region – Youth Development",
+  "group": "regional",
+  "edition_year": 2026,
+  "sort_order": 10,
+  "voting_enabled": true,
+  "description": "This award recognises a region that has consistently invested in nurturing, empowering, and equipping young people for spiritual growth, leadership, skill development, and national impact.",
+  "sections": [
+    {
+      "title": "Nominee Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "resides_in_region", "label": "Do you reside in Redemption City or any RCCG Region?", "type": "yes_no", "required": true},
+        {"key": "region_name", "label": "Nominated RCCG Region", "type": "short_text", "required": true},
+        {"key": "coordinator_contact", "label": "Region Pastor/Youth Coordinator's Contact (if known)", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Spiritual Development of Youths",
+      "fields": [
+        {"key": "spiritual_text", "label": "In less than 200 words, describe how this region has contributed to the spiritual growth of its youth (e.g. Bible Study, discipleship, prayer revival).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "spiritual_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Skill & Capacity Building Programs",
+      "fields": [
+        {"key": "skills_text", "label": "In less than 200 words, list or explain youth empowerment programs (e.g. tech training, entrepreneurship, career coaching, educational support).", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "skills_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Youth Engagement & Inclusion in Church Activities",
+      "fields": [
+        {"key": "engagement_text", "label": "In less than 200 words, explain how youths are involved in leadership, events, missions, and church projects within the region.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "engagement_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    },
+    {
+      "title": "Impact Measurement & Track Record",
+      "fields": [
+        {"key": "impact_text", "label": "In less than 200 words, provide verifiable results or testimonials of how the region's youth ministry has influenced lives, churches, or communities.", "type": "paragraph", "required": true, "max_words": 200},
+        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+      ]
+    }
+  ]
+}

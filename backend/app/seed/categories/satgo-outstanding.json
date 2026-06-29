@@ -1,0 +1,45 @@
+{
+  "slug": "satgo-outstanding",
+  "name": "SATGO – Outstanding Youth Province Award",
+  "group": "satgo",
+  "edition_year": 2026,
+  "sort_order": 23,
+  "voting_enabled": false,
+  "description": "A premier recognition awarded to a Youth Province demonstrating excellence across multiple areas of ministry, innovation, empowerment, and leadership development.",
+  "sections": [
+    {
+      "title": "Nomination Details",
+      "fields": [
+        {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": true},
+        {"key": "province_name", "label": "Nominated RCCG Youth Province", "type": "short_text", "required": true},
+        {"key": "coordinator_contact", "label": "Youth Province Coordinator/Pastor's Contact (if known)", "type": "short_text", "required": false}
+      ]
+    },
+    {
+      "title": "Overall Impact Assessment",
+      "fields": [
+        {"key": "vision_leadership", "label": "Describe the vision, strategy, and leadership approach driving the Youth Province.", "type": "paragraph", "required": true},
+        {"key": "technology_impact", "label": "In what way has the province impacted its members through technology initiatives? (digital platforms, media, coding/tech training, digital evangelism)", "type": "paragraph", "required": true},
+        {"key": "financial_empowerment", "label": "What strategic initiatives by the province have brought financial growth for its members? (financial literacy, entrepreneurship, economic empowerment)", "type": "paragraph", "required": true},
+        {"key": "skills_development", "label": "Describe skills and training programs developed for youths within the province in the last year (vocational training, career development, professional skills).", "type": "paragraph", "required": true},
+        {"key": "agriculture_sustainability", "label": "Describe agricultural or sustainability initiatives performed by the province in the last year.", "type": "paragraph", "required": true},
+        {"key": "leadership_development", "label": "What has been the province's strategy in the last year to develop leaders? (mentorship, leadership academy, service opportunities)", "type": "paragraph", "required": true}
+      ]
+    },
+    {
+      "title": "Measurable Impact in the Last One Year",
+      "fields": [
+        {"key": "num_empowerment_programs", "label": "Number of Youth Empowerment Programs", "type": "dropdown", "required": true, "options": ["0–2", "3–5", "6+"]},
+        {"key": "num_beneficiaries", "label": "Number of Youth Beneficiaries", "type": "dropdown", "required": true, "options": ["Below 100", "100–500", "500+"]},
+        {"key": "num_started_ventures", "label": "Number of Youth Who Have Started Businesses / Careers / Leadership Roles", "type": "dropdown", "required": true, "options": ["Below 10", "10–50", "50+"]}
+      ]
+    },
+    {
+      "title": "Final Submission",
+      "fields": [
+        {"key": "why_award", "label": "Why should this Youth Province receive the SATGO Outstanding Youth Province Award?", "type": "paragraph", "required": true, "max_words": 100},
+        {"key": "supporting_upload", "label": "Supporting Document Upload (program reports, pictures, videos, financial empowerment evidence, training records, testimonies, media links)", "type": "file_upload", "required": false, "accept": ["image/*", "video/*", "application/pdf"]}
+      ]
+    }
+  ]
+}
