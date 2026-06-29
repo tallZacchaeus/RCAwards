@@ -175,3 +175,13 @@ class Setting(Base):
 
     key: Mapped[str] = mapped_column(String(120), primary_key=True)
     value: Mapped[str | None] = mapped_column(Text)
+
+
+class Subscriber(Base):
+    """Newsletter / "be first to know" signups from the marketing site."""
+
+    __tablename__ = "subscribers"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(200), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

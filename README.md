@@ -27,8 +27,8 @@ PLAN.md     full plan, phases, and design/motion system
 | Phase | Scope | State |
 |---|---|---|
 | 1 | Form-schema engine, category seeds, DB models, migrations, validator | ✅ Done |
-| 2 | Backend API: submissions, uploads, auth, voting, judging, exports | ⏳ Next |
-| 3 | Marketing site (merged design + GSAP motion) | ☐ |
+| 2 | Backend API: submissions, uploads, signup, auth, judging, scoring, exports | ✅ Done |
+| 3 | Marketing site (merged design + GSAP motion) | ⏳ Next |
 | 4 | Nomination forms (dynamic renderer) | ☐ |
 | 5 | Public voting | ☐ |
 | 6 | Admin / judging dashboard | ☐ |

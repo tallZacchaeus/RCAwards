@@ -11,6 +11,9 @@ venv/
 *.db
 *.sqlite3
 
+# Locally-stored uploads (dev file storage)
+uploads/
+
 # Environment / secrets
 .env
 .env.local
