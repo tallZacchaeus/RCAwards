@@ -19,11 +19,13 @@ gold-on-black, Cinzel / Playfair Display / Cormorant Garamond / Manrope.
 
 ```
 app/
-  layout.tsx           # fonts, metadata, smooth-scroll + header/footer shell
-  page.tsx             # composes the narrative-scroll sections
-  nominate/page.tsx    # category picker
-  nominate/[slug]/...  # dynamic nomination form for one category
+  layout.tsx           # root: fonts, metadata, globals (html/body only)
   globals.css          # brand tokens (@theme) + keyframes + reduced-motion
+  (marketing)/         # public site — its own layout adds header/footer + Lenis
+    layout.tsx · page.tsx · nominate/… · vote/…
+  admin/               # logged-in console — its own shell, no marketing chrome
+    layout.tsx         # AuthProvider + route guard
+    login · nominations · nominations/[id] · leaderboard · nominees
 components/
   smooth-scroll        # Lenis, synced to GSAP ScrollTrigger
   reveal               # scroll-triggered reveal wrapper (GPU, fires once)
@@ -48,6 +50,20 @@ JSON, no hardcoding. Client-side validation mirrors the backend validator for
 instant feedback; the backend re-validates on submit. File fields upload to
 `/uploads` first, then their URLs ride along with the nomination to
 `POST /nominations`. Server-side field errors (422) map back onto the fields.
+
+## Voting (Phase 5)
+
+`/vote` → `/vote/[slug]` renders shortlisted nominees with live vote counts and a
+one-vote-per-category device gate (a `localStorage` device id pairs with the
+server's IP hash for anti-fraud).
+
+## Admin console (Phase 6)
+
+`/admin/*` is a logged-in console (JWT in `localStorage`, route-guarded) over the
+backend admin endpoints: the nomination queue with filters + CSV export, a detail
+view that resolves answer labels from the form schema, judge scoring against the
+1–10 criteria, status decisions, the average-score leaderboard, and the voting
+slate (add nominees, crown winners). Admin-only actions are gated by role.
 
 ## Develop
 

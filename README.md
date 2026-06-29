@@ -31,8 +31,8 @@ PLAN.md     full plan, phases, and design/motion system
 | 3 | Marketing site (merged design + GSAP motion) | ✅ Done |
 | 4 | Nomination forms (dynamic renderer) | ✅ Done |
 | 5 | Public voting | ✅ Done |
-| 6 | Admin / judging dashboard | ⏳ Next |
-| 7 | Hardening & launch | ☐ |
+| 6 | Admin / judging dashboard | ✅ Done |
+| 7 | Hardening & launch | ⏳ Next |
 
 ## Quick start (backend)
 

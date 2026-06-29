@@ -1,10 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cinzel, Playfair_Display, Cormorant_Garamond, Manrope } from "next/font/google";
 import "./globals.css";
-import { SmoothScroll } from "@/components/smooth-scroll";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
-import { EVENT } from "@/lib/site";
 
 const cinzel = Cinzel({
   subsets: ["latin"],
@@ -48,13 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${cinzel.variable} ${playfair.variable} ${cormorant.variable} ${manrope.variable}`}
     >
-      <body>
-        <SmoothScroll>
-          <SiteHeader />
-          <main>{children}</main>
-          <SiteFooter eventDate={EVENT.dateLabel} />
-        </SmoothScroll>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
