@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from ..antispam import check_honeypot
 from ..db import get_session
 from ..models import Category, Nomination, NominationFile
 from ..ratelimit import rate_limit
@@ -26,6 +27,7 @@ router = APIRouter(tags=["nominations"])
 def create_nomination(
     payload: NominationCreate, session: Session = Depends(get_session)
 ) -> NominationCreated:
+    check_honeypot(payload.website)
     category = session.scalar(
         select(Category).where(Category.slug == payload.category_slug)
     )

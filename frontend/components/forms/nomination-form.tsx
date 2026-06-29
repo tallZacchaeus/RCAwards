@@ -9,6 +9,7 @@ import { validateForm } from "@/lib/forms/validate";
 import { submitNomination } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { FieldRenderer } from "./field-renderer";
+import { Honeypot } from "./honeypot";
 
 export function NominationForm({ category }: { category: CategoryDetail }) {
   const form = category.form;
@@ -18,6 +19,7 @@ export function NominationForm({ category }: { category: CategoryDetail }) {
   const [submitting, setSubmitting] = useState(false);
   const [doneId, setDoneId] = useState<number | null>(null);
   const [formError, setFormError] = useState<string>();
+  const [hp, setHp] = useState("");
 
   function setAnswer(key: string, value: AnswerValue) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -55,7 +57,7 @@ export function NominationForm({ category }: { category: CategoryDetail }) {
       field_key,
       url: f.url,
     }));
-    const result = await submitNomination(form.slug, answers, fileRefs);
+    const result = await submitNomination(form.slug, answers, fileRefs, hp);
     setSubmitting(false);
 
     if (result.ok) {
@@ -92,6 +94,7 @@ export function NominationForm({ category }: { category: CategoryDetail }) {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-12" noValidate>
+      <Honeypot value={hp} onChange={setHp} />
       {form.sections.map((section, si) => (
         <section key={si} className="flex flex-col gap-6">
           <div className="flex flex-col gap-1">

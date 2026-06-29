@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import io
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
@@ -16,6 +17,7 @@ from ..models import (
     NominationStatus,
     Nominee,
     Score,
+    Setting,
     User,
     UserRole,
     Vote,
@@ -29,6 +31,8 @@ from ..schemas.api import (
     NomineeOut,
     ScoreCreate,
     ScoreOut,
+    SettingsOut,
+    SettingsUpdate,
     StatusUpdate,
     UserCreate,
     UserOut,
@@ -315,6 +319,69 @@ def update_nominee(
     nominee.is_winner = is_winner
     session.commit()
     return _nominee_out(session, nominee, nominee.category.slug)
+
+
+# --- Settings: voting window & results visibility (admin only) ----------------
+
+def _read_setting(session: Session, key: str) -> str | None:
+    row = session.get(Setting, key)
+    return row.value if row else None
+
+
+def _write_setting(session: Session, key: str, value: str | None) -> None:
+    row = session.get(Setting, key)
+    if value in (None, ""):
+        if row:
+            session.delete(row)
+    elif row:
+        row.value = value
+    else:
+        session.add(Setting(key=key, value=value))
+
+
+def _current_settings(session: Session) -> SettingsOut:
+    results = _read_setting(session, "voting_results_public")
+    return SettingsOut(
+        voting_opens_at=_read_setting(session, "voting_opens_at"),
+        voting_closes_at=_read_setting(session, "voting_closes_at"),
+        voting_results_public=results is None or results.lower() == "true",
+    )
+
+
+def _validate_iso(value: str, field: str) -> None:
+    if value == "":
+        return
+    try:
+        datetime.fromisoformat(value)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"{field} must be an ISO-8601 datetime")
+
+
+@router.get("/settings", response_model=SettingsOut)
+def get_settings(
+    session: Session = Depends(get_session), _: User = Depends(require_admin)
+) -> SettingsOut:
+    return _current_settings(session)
+
+
+@router.put("/settings", response_model=SettingsOut)
+def update_settings(
+    payload: SettingsUpdate,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> SettingsOut:
+    if payload.voting_opens_at is not None:
+        _validate_iso(payload.voting_opens_at, "voting_opens_at")
+        _write_setting(session, "voting_opens_at", payload.voting_opens_at)
+    if payload.voting_closes_at is not None:
+        _validate_iso(payload.voting_closes_at, "voting_closes_at")
+        _write_setting(session, "voting_closes_at", payload.voting_closes_at)
+    if payload.voting_results_public is not None:
+        _write_setting(
+            session, "voting_results_public", "true" if payload.voting_results_public else "false"
+        )
+    session.commit()
+    return _current_settings(session)
 
 
 # --- Users (admin only) -------------------------------------------------------

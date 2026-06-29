@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -36,22 +37,22 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-8 md:flex">
           {NAV.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className="text-sm text-ink-muted transition-colors hover:text-gold"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
-        <a
+        <Link
           href="/nominate"
           className="hidden rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold-hi transition-all hover:bg-gold/20 hover:shadow-[0_0_24px_-6px] hover:shadow-gold/50 md:inline-block"
         >
           Nominate Now
-        </a>
+        </Link>
 
         <button
           aria-label="Toggle menu"
@@ -65,14 +66,14 @@ export function SiteHeader() {
       {open && (
         <nav className="flex flex-col gap-1 border-t border-line bg-bg/95 px-5 py-4 md:hidden">
           {NAV.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
               className="py-2 text-sm text-ink-muted hover:text-gold"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
       )}

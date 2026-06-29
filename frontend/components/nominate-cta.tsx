@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { subscribe } from "@/lib/api";
 import { Countdown } from "./countdown";
 import { Reveal } from "./reveal";
+import { Honeypot } from "./forms/honeypot";
 
 type Status = "idle" | "loading" | "done" | "error";
 
 export function NominateCta() {
   const [email, setEmail] = useState("");
+  const [hp, setHp] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
   async function onSubmit(e: React.FormEvent) {
@@ -16,7 +19,7 @@ export function NominateCta() {
     if (!email) return;
     setStatus("loading");
     try {
-      await subscribe(email);
+      await subscribe(email, hp);
       setStatus("done");
       setEmail("");
     } catch {
@@ -51,12 +54,12 @@ export function NominateCta() {
         </Reveal>
 
         <Reveal className="mt-12 flex flex-col items-center gap-6">
-          <a
+          <Link
             href="/nominate"
             className="rounded-full bg-gradient-to-r from-gold-deep via-gold to-gold-bright px-10 py-4 text-sm font-bold uppercase tracking-wider text-bg transition-transform hover:scale-[1.03]"
           >
             Submit a Nomination
-          </a>
+          </Link>
 
           <p className="text-xs uppercase tracking-[0.3em] text-ink-muted">
             Be first to know when nominations open
@@ -65,6 +68,7 @@ export function NominateCta() {
             onSubmit={onSubmit}
             className="flex w-full max-w-md flex-col gap-3 sm:flex-row"
           >
+            <Honeypot value={hp} onChange={setHp} />
             <input
               type="email"
               required

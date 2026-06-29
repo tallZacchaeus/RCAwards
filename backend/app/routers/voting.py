@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from ..antispam import check_honeypot
 from ..db import get_session
 from ..models import Category, Nominee, Setting, Vote
 from ..ratelimit import rate_limit
@@ -107,6 +108,7 @@ def list_nominees(
 def cast_vote(
     payload: VoteCreate, request: Request, session: Session = Depends(get_session)
 ) -> VoteResult:
+    check_honeypot(payload.website)
     nominee = session.get(Nominee, payload.nominee_id)
     if nominee is None or not nominee.is_shortlisted:
         raise HTTPException(status_code=404, detail="Nominee not found")

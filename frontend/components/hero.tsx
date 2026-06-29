@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { EVENT } from "@/lib/site";
@@ -80,12 +81,12 @@ export function Hero() {
         </p>
 
         <div className="hero-cta-group mt-10 flex flex-col items-center gap-4 sm:flex-row">
-          <a
+          <Link
             href="/nominate"
             className="hero-cta group relative overflow-hidden rounded-full bg-gradient-to-r from-gold-deep via-gold to-gold-bright px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-transform hover:scale-[1.03]"
           >
             Nominate for 2026
-          </a>
+          </Link>
           <a
             href="#award"
             className="hero-cta rounded-full border border-gold/40 px-8 py-3.5 text-sm font-semibold uppercase tracking-wider text-gold-hi transition-colors hover:bg-gold/10"

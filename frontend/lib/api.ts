@@ -26,11 +26,11 @@ export async function getCategories(): Promise<CategorySummary[]> {
   }
 }
 
-export async function subscribe(email: string): Promise<boolean> {
+export async function subscribe(email: string, website = ""): Promise<boolean> {
   const res = await fetch(`${API_BASE}/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, website }),
   });
   if (!res.ok) throw new Error(`Signup failed (${res.status})`);
   const data = (await res.json()) as { subscribed: boolean };
@@ -113,12 +113,13 @@ export type SubmitResult =
 export async function submitNomination(
   categorySlug: string,
   answers: Answers,
-  files: FileRef[]
+  files: FileRef[],
+  website = ""
 ): Promise<SubmitResult> {
   const res = await fetch(`${API_BASE}/nominations`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ category_slug: categorySlug, answers, files }),
+    body: JSON.stringify({ category_slug: categorySlug, answers, files, website }),
   });
 
   if (res.status === 201) {

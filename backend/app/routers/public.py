@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from ..antispam import check_honeypot
 from ..db import get_session
 from ..models import Category, Subscriber
 from ..ratelimit import rate_limit
@@ -46,6 +47,7 @@ def get_category(slug: str, session: Session = Depends(get_session)) -> Category
 
 @router.post("/signup", response_model=SignupResult, dependencies=[Depends(rate_limit)])
 def signup(payload: SignupRequest, session: Session = Depends(get_session)) -> SignupResult:
+    check_honeypot(payload.website)
     email = payload.email.lower()
     exists = session.scalar(select(Subscriber).where(Subscriber.email == email))
     if exists:

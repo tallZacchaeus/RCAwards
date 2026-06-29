@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HOW_TO_NOMINATE } from "@/lib/site";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
@@ -26,12 +27,12 @@ export function HowToNominate() {
         </Reveal>
 
         <Reveal className="mt-14 flex justify-center">
-          <a
+          <Link
             href="/nominate"
             className="rounded-full bg-gradient-to-r from-gold-deep via-gold to-gold-bright px-9 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-transform hover:scale-[1.03]"
           >
             Open the Nomination Portal
-          </a>
+          </Link>
         </Reveal>
       </div>
     </section>

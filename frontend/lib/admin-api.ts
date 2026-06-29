@@ -171,6 +171,24 @@ export async function setWinner(id: number, isWinner: boolean): Promise<NomineeO
   );
 }
 
+export type AdminSettings = {
+  voting_opens_at: string | null;
+  voting_closes_at: string | null;
+  voting_results_public: boolean;
+};
+
+export async function getSettings(): Promise<AdminSettings> {
+  return json(await adminFetch(`/admin/settings`));
+}
+
+export async function updateSettings(
+  payload: Partial<AdminSettings>
+): Promise<AdminSettings> {
+  return json(
+    await adminFetch(`/admin/settings`, { method: "PUT", body: JSON.stringify(payload) })
+  );
+}
+
 export async function downloadCsv(category?: string): Promise<void> {
   const q = category ? `?category=${category}` : "";
   const res = await adminFetch(`/admin/nominations/export/csv${q}`);

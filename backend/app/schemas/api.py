@@ -34,6 +34,7 @@ class NominationCreate(BaseModel):
     category_slug: str
     answers: dict[str, Any]
     files: list[FileRef] = Field(default_factory=list)
+    website: str = ""  # honeypot — must stay empty
 
 
 class NominationCreated(BaseModel):
@@ -55,6 +56,7 @@ class UploadResult(BaseModel):
 
 class SignupRequest(BaseModel):
     email: EmailStr
+    website: str = ""  # honeypot — must stay empty
 
 
 class SignupResult(BaseModel):
@@ -149,6 +151,7 @@ class NomineeCreate(BaseModel):
 class VoteCreate(BaseModel):
     nominee_id: int
     voter_fingerprint: str = Field(min_length=8, max_length=128)
+    website: str = ""  # honeypot — must stay empty
 
 
 class VoteResult(BaseModel):
@@ -162,3 +165,16 @@ class VotingStatus(BaseModel):
     opens_at: Optional[str]
     closes_at: Optional[str]
     results_public: bool
+
+
+class SettingsOut(BaseModel):
+    voting_opens_at: Optional[str]
+    voting_closes_at: Optional[str]
+    voting_results_public: bool
+
+
+class SettingsUpdate(BaseModel):
+    # Empty string clears a window bound; omit a field to leave it unchanged.
+    voting_opens_at: Optional[str] = None
+    voting_closes_at: Optional[str] = None
+    voting_results_public: Optional[bool] = None
