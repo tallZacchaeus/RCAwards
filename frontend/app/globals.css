@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ * Redemption City Awards — brand tokens (constant every edition).
+ * See docs/brand.md. Palette: gold on black. Fonts wired from next/font.
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-bg: #0a0807;
+  --color-bg-raised: #120d08;
+  --color-bg-elevated: #1a1206;
+
+  --color-gold-deep: #8c6a1f;
+  --color-gold: #c9a24b;
+  --color-gold-bright: #d4af37;
+  --color-gold-hi: #f8e7a1;
+
+  --color-ink: #f5efe3;
+  --color-ink-muted: #b9ac93;
+  --color-line: rgba(201, 162, 75, 0.22);
+
+  --font-display: var(--font-cinzel), serif;
+  --font-serif: var(--font-playfair), serif;
+  --font-accent: var(--font-cormorant), serif;
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+}
+
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(201, 162, 75, 0.3);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: #120902;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#8c6a1f, #f8e7a1);
+  border-radius: 6px;
+}
+
+/* The signature metallic wordmark fill. */
+.text-metallic {
+  background: linear-gradient(
+    105deg,
+    #8c6a1f 0%,
+    #f8e7a1 38%,
+    #c9a24b 60%,
+    #fcefb4 82%,
+    #8c6a1f 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold) 50%,
+    transparent
+  );
+}
+
+/* Fine gold wash / vignette behind dark sections. */
+.gold-vignette {
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgba(201, 162, 75, 0.1), transparent 70%),
+    radial-gradient(40% 40% at 80% 100%, rgba(140, 106, 31, 0.08), transparent 70%);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 220% 50%;
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-90vh);
+    opacity: 0;
+  }
+}
+
+/* Resting state for reduced motion: content always visible without animation. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
