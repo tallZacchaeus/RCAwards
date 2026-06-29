@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { NAV, EVENT } from "@/lib/site";
+import { NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
@@ -47,7 +47,7 @@ export function SiteHeader() {
         </nav>
 
         <a
-          href={EVENT.nominateUrl}
+          href="/nominate"
           className="hidden rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold-hi transition-all hover:bg-gold/20 hover:shadow-[0_0_24px_-6px] hover:shadow-gold/50 md:inline-block"
         >
           Nominate Now

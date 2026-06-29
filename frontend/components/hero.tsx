@@ -81,7 +81,7 @@ export function Hero() {
 
         <div className="hero-cta-group mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <a
-            href="#nominate"
+            href="/nominate"
             className="hero-cta group relative overflow-hidden rounded-full bg-gradient-to-r from-gold-deep via-gold to-gold-bright px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-transform hover:scale-[1.03]"
           >
             Nominate for 2026

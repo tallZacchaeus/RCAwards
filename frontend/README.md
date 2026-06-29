@@ -19,20 +19,35 @@ gold-on-black, Cinzel / Playfair Display / Cormorant Garamond / Manrope.
 
 ```
 app/
-  layout.tsx       # fonts, metadata, smooth-scroll + header/footer shell
-  page.tsx         # composes the narrative-scroll sections
-  globals.css      # brand tokens (@theme) + keyframes + reduced-motion
+  layout.tsx           # fonts, metadata, smooth-scroll + header/footer shell
+  page.tsx             # composes the narrative-scroll sections
+  nominate/page.tsx    # category picker
+  nominate/[slug]/...  # dynamic nomination form for one category
+  globals.css          # brand tokens (@theme) + keyframes + reduced-motion
 components/
-  smooth-scroll    # Lenis, synced to GSAP ScrollTrigger
-  reveal           # scroll-triggered reveal wrapper (GPU transforms, fires once)
+  smooth-scroll        # Lenis, synced to GSAP ScrollTrigger
+  reveal               # scroll-triggered reveal wrapper (GPU, fires once)
   hero · breed-pillars · about-award · objectives · how-to-nominate ·
   categories · winners-gallery · sponsors · faq · nominate-cta ·
   site-header · site-footer · countdown
+  ui/                  # brand-styled primitives (button, input, textarea,
+                       # label, select, radio-group) on Radix — shadcn-conventioned
+  forms/               # nomination-form, field-renderer, linear-scale, file-upload
 lib/
-  site.ts          # static content (BREED, objectives, FAQ, fallback categories)
-  api.ts           # fetch categories + post signup to the backend
-  utils.ts         # cn()
+  site.ts              # static content (BREED, objectives, FAQ, fallback categories)
+  api.ts               # categories, category detail, signup, upload, submit
+  forms/               # form-definition types + client validator (mirrors backend)
+  utils.ts             # cn()
 ```
+
+## Nomination flow (Phase 4)
+
+`/nominate` lists categories; `/nominate/[slug]` fetches that category's form
+definition from the backend and renders it dynamically — any of the 23 forms from
+JSON, no hardcoding. Client-side validation mirrors the backend validator for
+instant feedback; the backend re-validates on submit. File fields upload to
+`/uploads` first, then their URLs ride along with the nomination to
+`POST /nominations`. Server-side field errors (422) map back onto the fields.
 
 ## Develop
 

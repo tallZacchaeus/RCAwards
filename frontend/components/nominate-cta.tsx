@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { EVENT } from "@/lib/site";
 import { subscribe } from "@/lib/api";
 import { Countdown } from "./countdown";
 import { Reveal } from "./reveal";
@@ -53,7 +52,7 @@ export function NominateCta() {
 
         <Reveal className="mt-12 flex flex-col items-center gap-6">
           <a
-            href={EVENT.nominateUrl}
+            href="/nominate"
             className="rounded-full bg-gradient-to-r from-gold-deep via-gold to-gold-bright px-10 py-4 text-sm font-bold uppercase tracking-wider text-bg transition-transform hover:scale-[1.03]"
           >
             Submit a Nomination
