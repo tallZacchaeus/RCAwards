@@ -1,5 +1,12 @@
 import { type CategorySummary, FALLBACK_CATEGORIES } from "./site";
-import type { Answers, CategoryDetail, FieldErrors, FileRef } from "./forms/types";
+import type {
+  Answers,
+  CategoryDetail,
+  FieldErrors,
+  FileRef,
+  Nominee,
+  VotingStatus,
+} from "./forms/types";
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
@@ -52,6 +59,51 @@ export async function uploadFile(file: File): Promise<{ url: string }> {
     throw new Error(detail?.detail ?? `Upload failed (${res.status})`);
   }
   return (await res.json()) as { url: string };
+}
+
+export async function getVotingStatus(): Promise<VotingStatus> {
+  try {
+    const res = await fetch(`${API_BASE}/voting/status`, { next: { revalidate: 60 } });
+    if (!res.ok) throw new Error();
+    return (await res.json()) as VotingStatus;
+  } catch {
+    return { open: false, opens_at: null, closes_at: null, results_public: true };
+  }
+}
+
+export async function getNominees(categorySlug: string): Promise<Nominee[]> {
+  try {
+    const res = await fetch(`${API_BASE}/nominees?category=${categorySlug}`, {
+      next: { revalidate: 30 },
+    });
+    if (!res.ok) return [];
+    return (await res.json()) as Nominee[];
+  } catch {
+    return [];
+  }
+}
+
+export type VoteOutcome =
+  | { ok: true; voteCount: number }
+  | { ok: false; status: number; message: string };
+
+export async function castVote(
+  nomineeId: number,
+  fingerprint: string
+): Promise<VoteOutcome> {
+  const res = await fetch(`${API_BASE}/votes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nominee_id: nomineeId, voter_fingerprint: fingerprint }),
+  });
+  if (res.ok) {
+    const data = (await res.json()) as { vote_count: number };
+    return { ok: true, voteCount: data.vote_count };
+  }
+  const detail = await res.json().catch(() => null);
+  const message =
+    typeof detail?.detail === "string" ? detail.detail : "Could not record your vote.";
+  return { ok: false, status: res.status, message };
 }
 
 export type SubmitResult =

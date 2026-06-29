@@ -88,6 +88,9 @@ uvicorn app.main:app --reload
 | POST | `/nominations` | Submit a nomination (validated against the category's form) |
 | POST | `/uploads` | Upload a supporting file → returns a URL reference |
 | POST | `/signup` | Newsletter "be first to know" signup |
+| GET | `/voting/status` | Voting window state + whether results are public |
+| GET | `/nominees?category=` | Shortlisted nominees for a category (with vote counts) |
+| POST | `/votes` | Cast a vote (device fingerprint + server-hashed IP) |
 
 ### Auth
 
@@ -107,11 +110,20 @@ uvicorn app.main:app --reload
 | POST | `/admin/nominations/{id}/scores` | admin, judge | Submit/replace this judge's score |
 | GET | `/admin/categories/{slug}/leaderboard` | admin, judge | Nominations ranked by average judge total |
 | GET | `/admin/nominations/export/csv` | admin | CSV export (`?category=` optional) |
+| POST | `/admin/nominees` | admin | Add a nominee to a category's voting slate |
+| GET | `/admin/nominees` | admin, judge | List nominees (with vote counts) |
+| POST | `/admin/nominations/{id}/shortlist` | admin | Promote a nomination to a nominee |
+| PATCH | `/admin/nominees/{id}?is_winner=` | admin | Crown / un-crown a winner |
 | POST | `/admin/users` | admin | Create an admin/judge account |
 | GET | `/admin/users` | admin | List staff accounts |
 
 Public write endpoints are rate-limited per IP (configurable). Passwords are
 hashed with PBKDF2-HMAC-SHA256; auth is stateless JWT.
 
-> **Note:** Public **voting** (Phase 5) is intentionally not built yet — the
-> `nominees`/`votes` tables exist, but the endpoints arrive with the voting UI.
+### Voting window & anti-fraud
+
+Voting is gated by `settings` rows (`voting_opens_at`, `voting_closes_at`,
+`voting_results_public`) — open by default when unset. Each vote carries a
+client device fingerprint and a server-side salted SHA-256 hash of the IP (the
+raw IP is never stored). Rules enforced server-side: one vote per category per
+device, no double-voting a nominee (unique constraint), and the voting window.

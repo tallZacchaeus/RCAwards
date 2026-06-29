@@ -14,15 +14,19 @@ from ..models import (
     Category,
     Nomination,
     NominationStatus,
+    Nominee,
     Score,
     User,
     UserRole,
+    Vote,
 )
 from ..schemas.api import (
     FileRef,
     LeaderboardEntry,
     NominationDetail,
     NominationListItem,
+    NomineeCreate,
+    NomineeOut,
     ScoreCreate,
     ScoreOut,
     StatusUpdate,
@@ -219,6 +223,98 @@ def export_csv(
         media_type="text/csv",
         headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
+
+
+# --- Nominees / voting slate (admin only) -------------------------------------
+
+def _nominee_out(session: Session, nominee: Nominee, slug: str) -> NomineeOut:
+    count = session.scalar(
+        select(func.count(Vote.id)).where(Vote.nominee_id == nominee.id)
+    )
+    return NomineeOut(
+        id=nominee.id,
+        category_slug=slug,
+        display_name=nominee.display_name,
+        summary=nominee.summary,
+        photo_url=nominee.photo_url,
+        vote_count=int(count or 0),
+        is_winner=nominee.is_winner,
+    )
+
+
+@router.get("/nominees", response_model=list[NomineeOut])
+def list_nominees(
+    category: str | None = Query(None),
+    session: Session = Depends(get_session),
+    _: User = Depends(require_staff),
+) -> list[NomineeOut]:
+    stmt = select(Nominee, Category.slug).join(Category, Nominee.category_id == Category.id)
+    if category:
+        stmt = stmt.where(Category.slug == category)
+    stmt = stmt.order_by(Nominee.display_name)
+    return [_nominee_out(session, n, slug) for n, slug in session.execute(stmt).all()]
+
+
+@router.post("/nominees", response_model=NomineeOut, status_code=status.HTTP_201_CREATED)
+def create_nominee(
+    payload: NomineeCreate,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> NomineeOut:
+    category = session.scalar(select(Category).where(Category.slug == payload.category_slug))
+    if category is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+    nominee = Nominee(
+        category_id=category.id,
+        display_name=payload.display_name,
+        summary=payload.summary,
+        photo_url=payload.photo_url,
+        source_nomination_id=payload.source_nomination_id,
+        edition_year=category.edition_year,
+        is_shortlisted=True,
+    )
+    session.add(nominee)
+    session.commit()
+    session.refresh(nominee)
+    return _nominee_out(session, nominee, category.slug)
+
+
+@router.post("/nominations/{nomination_id}/shortlist", response_model=NomineeOut, status_code=status.HTTP_201_CREATED)
+def shortlist_nomination(
+    nomination_id: int,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> NomineeOut:
+    """Promote a nomination to a shortlisted nominee (eligible for voting)."""
+    nomination = _get_nomination(session, nomination_id)
+    nomination.status = NominationStatus.shortlisted
+    display_name = summarize_submission(nomination.answers)["nominee_name"] or f"Nominee #{nomination.id}"
+    nominee = Nominee(
+        category_id=nomination.category_id,
+        source_nomination_id=nomination.id,
+        display_name=display_name,
+        edition_year=nomination.category.edition_year,
+        is_shortlisted=True,
+    )
+    session.add(nominee)
+    session.commit()
+    session.refresh(nominee)
+    return _nominee_out(session, nominee, nomination.category.slug)
+
+
+@router.patch("/nominees/{nominee_id}", response_model=NomineeOut)
+def update_nominee(
+    nominee_id: int,
+    is_winner: bool = Query(...),
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> NomineeOut:
+    nominee = session.get(Nominee, nominee_id)
+    if nominee is None:
+        raise HTTPException(status_code=404, detail="Nominee not found")
+    nominee.is_winner = is_winner
+    session.commit()
+    return _nominee_out(session, nominee, nominee.category.slug)
 
 
 # --- Users (admin only) -------------------------------------------------------

@@ -15,11 +15,11 @@ export const EVENT = {
 };
 
 export const NAV = [
-  { label: "About", href: "#about" },
-  { label: "The Award", href: "#award" },
-  { label: "Categories", href: "#categories" },
-  { label: "Winners", href: "#winners" },
-  { label: "Nominate", href: "#nominate" },
+  { label: "About", href: "/#about" },
+  { label: "Categories", href: "/#categories" },
+  { label: "Winners", href: "/#winners" },
+  { label: "Vote", href: "/vote" },
+  { label: "Nominate", href: "/nominate" },
 ];
 
 /** City Breed's five identity pillars. */
@@ -114,6 +114,8 @@ export type CategorySummary = {
   name: string;
   group: string;
   description: string;
+  voting_enabled?: boolean;
+  nominations_open?: boolean;
 };
 
 export const FALLBACK_CATEGORIES: CategorySummary[] = [

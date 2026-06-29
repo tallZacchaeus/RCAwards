@@ -51,6 +51,23 @@ export type CategoryDetail = {
   form: FormDefinition;
 };
 
+export type Nominee = {
+  id: number;
+  category_slug: string;
+  display_name: string;
+  summary: string | null;
+  photo_url: string | null;
+  vote_count: number;
+  is_winner: boolean;
+};
+
+export type VotingStatus = {
+  open: boolean;
+  opens_at: string | null;
+  closes_at: string | null;
+  results_public: boolean;
+};
+
 export type AnswerValue = string | number | undefined;
 export type Answers = Record<string, AnswerValue>;
 export type FieldErrors = Record<string, string>;

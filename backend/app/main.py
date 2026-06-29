@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .config import get_settings
-from .routers import admin, auth, nominations, public
+from .routers import admin, auth, nominations, public, voting
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name)
@@ -34,6 +34,7 @@ def health() -> dict:
 
 app.include_router(public.router)
 app.include_router(nominations.router)
+app.include_router(voting.router)
 app.include_router(auth.router)
 app.include_router(admin.router)
 

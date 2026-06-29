@@ -27,6 +27,16 @@ def hash_password(password: str) -> str:
     return f"pbkdf2_sha256${_PBKDF2_ROUNDS}${salt.hex()}${digest.hex()}"
 
 
+def hash_ip(ip: str) -> str:
+    """Stable, non-reversible hash of a client IP, salted with the app secret.
+
+    Stored alongside votes as a secondary anti-fraud signal — we never keep the
+    raw IP.
+    """
+    salt = get_settings().jwt_secret.encode()
+    return hashlib.sha256(salt + ip.encode()).hexdigest()
+
+
 def verify_password(password: str, encoded: str) -> bool:
     try:
         algorithm, rounds, salt_hex, digest_hex = encoded.split("$")

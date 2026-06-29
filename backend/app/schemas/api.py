@@ -124,3 +124,41 @@ class LeaderboardEntry(BaseModel):
     average_total: float
     judge_count: int
     status: str
+
+
+# --- Voting -------------------------------------------------------------------
+
+class NomineeOut(BaseModel):
+    id: int
+    category_slug: str
+    display_name: str
+    summary: Optional[str]
+    photo_url: Optional[str]
+    vote_count: int
+    is_winner: bool
+
+
+class NomineeCreate(BaseModel):
+    category_slug: str
+    display_name: str
+    summary: Optional[str] = None
+    photo_url: Optional[str] = None
+    source_nomination_id: Optional[int] = None
+
+
+class VoteCreate(BaseModel):
+    nominee_id: int
+    voter_fingerprint: str = Field(min_length=8, max_length=128)
+
+
+class VoteResult(BaseModel):
+    nominee_id: int
+    vote_count: int
+    voted: bool = True
+
+
+class VotingStatus(BaseModel):
+    open: bool
+    opens_at: Optional[str]
+    closes_at: Optional[str]
+    results_public: bool
