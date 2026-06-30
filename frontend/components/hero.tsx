@@ -5,6 +5,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { EVENT } from "@/lib/site";
+import { AnimatedTrophy } from "./animated-trophy";
 
 // Deterministic particle field — no Math.random to avoid hydration mismatch.
 // Each particle gets a CSS custom property for horizontal drift.
@@ -137,7 +138,13 @@ export function Hero() {
           of Excellence
         </span>
 
-        <p className="hero-desc mt-8 max-w-2xl font-accent text-lg text-ink-muted sm:text-2xl">
+        {/* The master-brand trophy, alive */}
+        <AnimatedTrophy
+          className="mt-4 w-full"
+          imgHeightClass="h-[clamp(220px,32vh,380px)]"
+        />
+
+        <p className="hero-desc mt-4 max-w-2xl font-accent text-lg text-ink-muted sm:text-2xl">
           Honouring the individuals, businesses, and organisations that elevate
           Redemption City toward global greatness.
         </p>

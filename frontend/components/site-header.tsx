@@ -44,14 +44,16 @@ export function SiteHeader() {
         )}
       >
         <div className="flex items-center justify-between px-5 py-3.5 sm:px-7">
-          <a href="#top" className="flex flex-col leading-none group">
-            <span className="font-display text-sm font-bold tracking-[0.3em] text-ink transition-colors group-hover:text-gold-hi">
-              CITY<span className="text-gold">BREED</span>
-            </span>
-            <span className="text-[9px] uppercase tracking-[0.34em] text-ink-muted">
-              Redemption City
-            </span>
-          </a>
+          <Link href="/#top" className="flex items-center" aria-label="City Breed — Redemption City, home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/logo.png"
+              alt="City Breed — Redemption City"
+              width={133}
+              height={87}
+              className="h-9 w-auto transition-opacity hover:opacity-90 sm:h-10"
+            />
+          </Link>
 
           <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
             {NAV.map((item) => (

@@ -7,6 +7,7 @@ import type { AnswerValue, CategoryDetail, Answers, FieldErrors, FileRef } from 
 import { OTHER_SUFFIX } from "@/lib/forms/types";
 import { validateForm } from "@/lib/forms/validate";
 import { submitNomination } from "@/lib/api";
+import { fireConfetti } from "@/lib/confetti";
 import { Button } from "@/components/ui/button";
 import { FieldRenderer } from "./field-renderer";
 import { Honeypot } from "./honeypot";
@@ -62,6 +63,7 @@ export function NominationForm({ category }: { category: CategoryDetail }) {
 
     if (result.ok) {
       setDoneId(result.id);
+      fireConfetti();
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setErrors(result.fieldErrors);

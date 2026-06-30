@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Check, Crown, Loader2 } from "lucide-react";
 import type { Nominee } from "@/lib/forms/types";
 import { castVote } from "@/lib/api";
+import { fireConfetti } from "@/lib/confetti";
 import { getDeviceId, getVotedNominee, rememberVote } from "@/lib/vote-store";
 import { Button } from "@/components/ui/button";
 import { Lottie } from "@/components/lottie";
@@ -43,6 +44,7 @@ export function VoteGallery({
       );
       rememberVote(categorySlug, nomineeId);
       setVotedId(nomineeId);
+      fireConfetti();
     } else if (outcome.status === 409) {
       rememberVote(categorySlug, nomineeId);
       setVotedId(nomineeId);
