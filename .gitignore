@@ -34,3 +34,6 @@ dist/
 
 # Source content docs (kept locally, not committed — see docs/README)
 *.docx
+
+# Original brand source images at repo root (large; optimized copies live in frontend/public/brand)
+/*.png

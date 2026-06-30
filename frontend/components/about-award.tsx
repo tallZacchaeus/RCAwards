@@ -1,6 +1,5 @@
-import { EVENT } from "@/lib/site";
 import { Reveal } from "./reveal";
-import { Lottie } from "./lottie";
+import { AnimatedTrophy } from "./animated-trophy";
 
 export function AboutAward() {
   return (
@@ -62,67 +61,9 @@ export function AboutAward() {
           </div>
         </Reveal>
 
-        {/* Visual column — orbit rings */}
+        {/* Visual column — the master-brand trophy, alive */}
         <Reveal className="relative flex items-center justify-center py-8">
-          <div className="relative flex h-[360px] w-[360px] items-center justify-center overflow-hidden sm:h-[420px] sm:w-[420px] sm:overflow-visible">
-            {/* Orbit ring 1 — 95% of container */}
-            <div
-              aria-hidden="true"
-              className="absolute rounded-full border border-dashed border-gold/12"
-              style={{ inset: "2.5%", animation: "orbitSpin 30s linear infinite" }}
-            />
-            {/* Orbit ring 2 — 72% of container */}
-            <div
-              aria-hidden="true"
-              className="absolute rounded-full border border-dashed border-gold/20"
-              style={{ inset: "14%", animation: "orbitSpinReverse 20s linear infinite" }}
-            />
-            {/* Orbit ring 3 — 52% of container */}
-            <div
-              aria-hidden="true"
-              className="absolute rounded-full border border-gold/15"
-              style={{ inset: "24%", animation: "orbitSpin 14s linear infinite" }}
-            />
-
-            {/* Orbit dot on ring 1 */}
-            <div
-              aria-hidden="true"
-              className="absolute"
-              style={{ inset: "2.5%", animation: "orbitSpin 30s linear infinite" }}
-            >
-              <div className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-gold shadow-[0_0_12px_3px_rgba(201,162,75,0.5)]" />
-            </div>
-
-            {/* Orbit dot on ring 2 */}
-            <div
-              aria-hidden="true"
-              className="absolute"
-              style={{ inset: "14%", animation: "orbitSpinReverse 20s linear infinite" }}
-            >
-              <div className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-gold-hi shadow-[0_0_8px_2px_rgba(248,231,161,0.5)]" />
-            </div>
-
-            {/* Centre card */}
-            <div className="relative z-10 flex flex-col items-center justify-center rounded-3xl border border-gold/30 bg-gradient-to-b from-bg-elevated to-bg p-8 text-center shadow-[0_0_60px_-20px_rgba(201,162,75,0.3)]"
-              style={{ width: "180px", height: "180px" }}
-            >
-              <div
-                className="pointer-events-none absolute inset-0 rounded-3xl"
-                style={{
-                  background:
-                    "radial-gradient(50% 50% at 50% 40%, rgba(201,162,75,0.18), transparent)",
-                }}
-                aria-hidden="true"
-              />
-              <Lottie src="/lottie/star.json" className="relative h-16 w-16" />
-              <span className="relative mt-2 font-display text-[10px] uppercase tracking-[0.3em] text-ink">
-                {EVENT.edition}
-              </span>
-              <span className="relative mt-1 font-accent text-sm italic text-gold-hi">
-                {EVENT.tagline.split(".")[0]}
-              </span>
-            </div>
-          </div>
+          <AnimatedTrophy className="h-[clamp(420px,60vh,620px)] w-full" />
         </Reveal>
       </div>
     </section>
