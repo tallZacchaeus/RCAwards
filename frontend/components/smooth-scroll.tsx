@@ -2,32 +2,33 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
-
+/** Wraps the page with Lenis smooth scroll.
+ *  We no longer bridge GSAP ScrollTrigger here since reveals now use
+ *  IntersectionObserver which works correctly with virtual scroll. */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
+
     if (prefersReduced) return;
 
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 1.25,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      touchMultiplier: 1.5,
     });
 
-    // Keep ScrollTrigger in lockstep with Lenis's virtual scroll.
-    lenis.on("scroll", ScrollTrigger.update);
-    const onTick = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(onTick);
-    gsap.ticker.lagSmoothing(0);
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    const id = requestAnimationFrame(raf);
 
     return () => {
-      gsap.ticker.remove(onTick);
+      cancelAnimationFrame(id);
       lenis.destroy();
     };
   }, []);

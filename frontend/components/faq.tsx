@@ -19,31 +19,58 @@ export function Faq() {
           return (
             <div
               key={i}
-              className="overflow-hidden rounded-2xl border border-line bg-bg-raised/50"
+              className={cn(
+                "overflow-hidden rounded-2xl border transition-all duration-300",
+                isOpen
+                  ? "border-gold/40 bg-bg-elevated shadow-[0_0_24px_-8px_rgba(201,162,75,0.2)]"
+                  : "border-line bg-bg-raised/50 hover:border-gold/20"
+              )}
             >
               <button
                 onClick={() => setOpen(isOpen ? null : i)}
                 className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                 aria-expanded={isOpen}
+                id={`faq-btn-${i}`}
+                aria-controls={`faq-panel-${i}`}
               >
-                <span className="font-serif text-lg text-ink">{item.q}</span>
                 <span
                   className={cn(
-                    "text-xl text-gold transition-transform duration-300",
-                    isOpen && "rotate-45"
+                    "font-serif text-lg transition-colors duration-300",
+                    isOpen ? "text-gold-hi" : "text-ink"
                   )}
+                >
+                  {item.q}
+                </span>
+                <span
+                  className={cn(
+                    "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border text-sm font-bold transition-all duration-300",
+                    isOpen
+                      ? "border-gold bg-gold/20 text-gold rotate-45"
+                      : "border-line text-ink-muted"
+                  )}
+                  aria-hidden="true"
                 >
                   +
                 </span>
               </button>
+
+              {/* CSS grid-rows accordion — works in all modern browsers */}
               <div
+                id={`faq-panel-${i}`}
+                role="region"
+                aria-labelledby={`faq-btn-${i}`}
                 className={cn(
-                  "grid transition-all duration-300",
+                  "grid transition-all duration-500",
                   isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                 )}
+                style={{
+                  transitionTimingFunction: isOpen
+                    ? "cubic-bezier(0.16, 1, 0.3, 1)"
+                    : "cubic-bezier(0.7, 0, 0.84, 0)",
+                }}
               >
                 <div className="overflow-hidden">
-                  <p className="px-6 pb-5 text-sm leading-relaxed text-ink-muted">
+                  <p className="px-6 pb-6 pt-1 text-sm leading-relaxed text-ink-muted">
                     {item.a}
                   </p>
                 </div>

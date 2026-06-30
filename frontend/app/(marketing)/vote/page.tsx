@@ -102,17 +102,24 @@ function VoteCard({ category }: { category: CategorySummary }) {
   return (
     <Link
       href={`/vote/${category.slug}`}
-      className="group flex flex-col gap-3 rounded-2xl border border-line bg-bg-raised/50 p-6 transition-all duration-500 hover:-translate-y-1 hover:border-gold/40 hover:bg-bg-elevated"
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-line bg-bg-raised/50 p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-gold/40 hover:bg-bg-elevated hover:shadow-[0_8px_32px_-8px_rgba(201,162,75,0.2)]"
     >
+      {/* Bottom sweep accent */}
+      <div
+        className="absolute bottom-0 inset-x-0 h-px origin-left scale-x-0 bg-gradient-to-r from-gold via-gold-bright to-transparent transition-transform duration-500 group-hover:scale-x-100"
+        aria-hidden="true"
+      />
+
       <h3 className="font-serif text-xl leading-snug text-ink transition-colors group-hover:text-gold-hi">
         {category.name}
       </h3>
-      <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">
+      <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-ink-muted">
         {category.description}
       </p>
-      <span className="mt-2 text-xs uppercase tracking-[0.25em] text-gold opacity-0 transition-opacity group-hover:opacity-100">
+      <span className="mt-2 flex items-center gap-1 text-xs uppercase tracking-[0.25em] text-gold opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
         View nominees →
       </span>
     </Link>
   );
 }
+
