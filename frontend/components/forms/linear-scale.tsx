@@ -30,7 +30,7 @@ export function LinearScale({
               className={cn(
                 "aspect-square rounded-lg border text-sm font-medium transition-all",
                 active
-                  ? "border-gold bg-gradient-to-b from-gold to-gold-deep text-bg"
+                  ? "border-gold bg-gold text-bg"
                   : "border-line text-ink-muted hover:border-gold/50 hover:text-gold"
               )}
             >

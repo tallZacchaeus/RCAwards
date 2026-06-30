@@ -62,7 +62,7 @@ export function Hero() {
           alt="The Redemption City Award of Excellence trophy"
           width={1300}
           height={1300}
-          className="hero-trophy relative z-10 h-[clamp(280px,56vh,600px)] w-auto select-none"
+          className="hero-trophy relative z-10 h-[clamp(360px,68vh,760px)] w-auto select-none"
           style={{ filter: "drop-shadow(0 36px 44px rgba(0,0,0,0.55))" }}
           draggable={false}
         />
