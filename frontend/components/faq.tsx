@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { FAQ as FAQ_ITEMS } from "@/lib/site";
-import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
 import { cn } from "@/lib/utils";
 
@@ -10,75 +9,62 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="mx-auto max-w-3xl px-5 py-28 sm:px-8">
-      <SectionHeading eyebrow="FAQ" title="Questions, answered" />
+    <section id="faq" className="surface-paper">
+      <div className="mx-auto max-w-4xl px-5 py-24 sm:px-8 lg:py-32">
+        <Reveal className="mb-12 flex flex-col gap-4">
+          <span className="eyebrow text-gold-deep">FAQ</span>
+          <h2 className="display text-[clamp(2.5rem,6vw,5rem)] text-graphite">
+            questions, answered
+          </h2>
+        </Reveal>
 
-      <Reveal className="mt-12 flex flex-col gap-3">
-        {FAQ_ITEMS.map((item, i) => {
-          const isOpen = open === i;
-          return (
-            <div
-              key={i}
-              className={cn(
-                "overflow-hidden rounded-2xl border transition-all duration-300",
-                isOpen
-                  ? "border-gold/40 bg-bg-elevated shadow-[0_0_24px_-8px_rgba(201,162,75,0.2)]"
-                  : "border-line bg-bg-raised/50 hover:border-gold/20"
-              )}
-            >
-              <button
-                onClick={() => setOpen(isOpen ? null : i)}
-                className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
-                aria-expanded={isOpen}
-                id={`faq-btn-${i}`}
-                aria-controls={`faq-panel-${i}`}
-              >
-                <span
-                  className={cn(
-                    "font-serif text-lg transition-colors duration-300",
-                    isOpen ? "text-gold-hi" : "text-ink"
-                  )}
-                >
-                  {item.q}
-                </span>
-                <span
-                  className={cn(
-                    "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border text-sm font-bold transition-all duration-300",
-                    isOpen
-                      ? "border-gold bg-gold/20 text-gold rotate-45"
-                      : "border-line text-ink-muted"
-                  )}
-                  aria-hidden="true"
-                >
-                  +
-                </span>
-              </button>
-
-              {/* CSS grid-rows accordion — works in all modern browsers */}
-              <div
-                id={`faq-panel-${i}`}
-                role="region"
-                aria-labelledby={`faq-btn-${i}`}
-                className={cn(
-                  "grid transition-all duration-500",
-                  isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                )}
-                style={{
-                  transitionTimingFunction: isOpen
-                    ? "cubic-bezier(0.16, 1, 0.3, 1)"
-                    : "cubic-bezier(0.7, 0, 0.84, 0)",
-                }}
-              >
-                <div className="overflow-hidden">
-                  <p className="px-6 pb-6 pt-1 text-sm leading-relaxed text-ink-muted">
-                    {item.a}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </Reveal>
+        <Reveal>
+          <ul>
+            {FAQ_ITEMS.map((item, i) => {
+              const isOpen = open === i;
+              return (
+                <li key={i} className="border-t border-rule last:border-b">
+                  <button
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    className="flex w-full items-center justify-between gap-6 py-6 text-left"
+                    aria-expanded={isOpen}
+                    id={`faq-btn-${i}`}
+                    aria-controls={`faq-panel-${i}`}
+                  >
+                    <span className="font-serif text-xl text-graphite sm:text-2xl">
+                      {item.q}
+                    </span>
+                    <span
+                      className={cn(
+                        "shrink-0 text-2xl text-gold-deep transition-transform duration-300",
+                        isOpen && "rotate-45"
+                      )}
+                      aria-hidden="true"
+                    >
+                      +
+                    </span>
+                  </button>
+                  <div
+                    id={`faq-panel-${i}`}
+                    role="region"
+                    aria-labelledby={`faq-btn-${i}`}
+                    className={cn(
+                      "grid transition-all duration-500",
+                      isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                    )}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="max-w-2xl pb-6 text-sm leading-relaxed text-slate sm:text-base">
+                        {item.a}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </Reveal>
+      </div>
     </section>
   );
 }
