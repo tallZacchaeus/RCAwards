@@ -1,57 +1,58 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ *
- * Redemption City Awards — brand tokens (constant every edition).
- * See docs/brand.md. Palette: gold on black. Fonts wired from next/font.
+ * Redemption City Awards — editorial overhaul.
+ * Two flat surfaces (dark-gold brand + light editorial), gold as accent
+ * only. NO gradients, glows, particles, or metallic fills. See REDESIGN.md.
  * ------------------------------------------------------------------ */
 @theme {
+  /* Dark-gold brand surface (hero, header, CTA, footer) */
   --color-bg: #0a0807;
-  --color-bg-raised: #120d08;
-  --color-bg-elevated: #1a1206;
+  --color-bg-raised: #141008;
+  --color-bg-elevated: #1c1609;
 
+  /* Light editorial surface (about, winners, categories, jury) */
+  --color-paper: #eceae4;
+  --color-card: #f6f4ef;
+  --color-graphite: #16130e;
+  --color-slate: #6e675c;
+  --color-rule: rgba(20, 17, 12, 0.12);
+
+  /* Gold — accent only (one button, a rule, a mark) */
   --color-gold-deep: #8c6a1f;
   --color-gold: #c9a24b;
   --color-gold-bright: #d4af37;
   --color-gold-hi: #f8e7a1;
 
-  --color-ink: #f5efe3;
-  --color-ink-muted: #b9ac93;
-  --color-line: rgba(201, 162, 75, 0.22);
+  /* Ink on the dark surface */
+  --color-ink: #f3eee3;
+  --color-ink-muted: #9a917f;
+  --color-line: rgba(201, 162, 75, 0.18);
 
-  --font-display: var(--font-cinzel), serif;
+  --font-display: var(--font-manrope), system-ui, sans-serif;
   --font-serif: var(--font-playfair), serif;
   --font-accent: var(--font-cormorant), serif;
   --font-sans: var(--font-manrope), system-ui, sans-serif;
+  --font-wordmark: var(--font-cinzel), serif;
 }
 
-/* ── Motion tokens ─────────────────────────────────────────────────── */
 :root {
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-expo:  cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-fast: 200ms;
+  --ease-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
   --duration-base: 400ms;
   --duration-slow: 700ms;
 }
 
-/* Reduced-motion: use a custom property so specific animations
-   can still opt in to a softer alternative (not a global nuke). */
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --duration-fast: 0.001ms;
-    --duration-base: 0.001ms;
-    --duration-slow: 0.001ms;
-  }
   html { scroll-behavior: auto; }
   .motion-safe-only { display: none !important; }
 }
 
-/* ── Reset ─────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 96px;
+  scroll-padding-top: 88px;
 }
 
 body {
@@ -65,290 +66,108 @@ body {
 }
 
 ::selection {
-  background: rgba(201, 162, 75, 0.3);
-  color: #fff;
+  background: var(--color-gold);
+  color: #0a0807;
 }
 
-/* ── Scrollbar ─────────────────────────────────────────────────────── */
-::-webkit-scrollbar        { width: 6px; }
-::-webkit-scrollbar-track  { background: #0a0807; }
-::-webkit-scrollbar-thumb  {
-  background: linear-gradient(in oklch, #8c6a1f, #f8e7a1);
-  border-radius: 6px;
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: #3a2f17; border-radius: 0; }
+
+/* ── Surfaces ──────────────────────────────────────────────────────── */
+.surface-dark  { background: var(--color-bg);    color: var(--color-ink); }
+.surface-paper { background: var(--color-paper);  color: var(--color-graphite); }
+.surface-card  { background: var(--color-card);   color: var(--color-graphite); }
+
+/* ── Editorial type ────────────────────────────────────────────────── */
+/* Oversized, tight, lowercase display — the anti-AI move. */
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  text-transform: lowercase;
+}
+.wordmark {
+  font-family: var(--font-wordmark);
+  letter-spacing: 0.02em;
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.72rem;
+  font-weight: 500;
 }
 
-/* ── Scroll Progress Bar (CSS-only, scroll-driven) ─────────────────── */
-@supports (animation-timeline: scroll()) {
-  .scroll-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    z-index: 100;
-    background: linear-gradient(
-      90deg in oklch,
-      var(--color-gold-deep),
-      var(--color-gold-bright),
-      var(--color-gold-hi)
-    );
-    transform-origin: left;
-    transform: scaleX(0);
-    animation: scrollProgress linear both;
-    animation-timeline: scroll(root block);
-  }
-  @keyframes scrollProgress {
-    from { transform: scaleX(0); }
-    to   { transform: scaleX(1); }
-  }
-}
-
-/* Fallback for browsers without scroll-driven animations */
-@supports not (animation-timeline: scroll()) {
-  .scroll-progress { display: none; }
-}
-
-/* ── Text effects ──────────────────────────────────────────────────── */
-.text-metallic {
-  background: linear-gradient(
-    105deg in oklch,
-    #8c6a1f 0%,
-    #f8e7a1 38%,
-    #c9a24b 60%,
-    #fcefb4 82%,
-    #8c6a1f 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* ── Dividers ──────────────────────────────────────────────────────── */
-.hairline {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-gold) 50%,
-    transparent
-  );
-}
-
-/* ── Gold vignette overlays ────────────────────────────────────────── */
-.gold-vignette {
-  background:
-    radial-gradient(60% 50% at 50% 0%, rgba(201, 162, 75, 0.12), transparent 70%),
-    radial-gradient(40% 40% at 80% 100%, rgba(140, 106, 31, 0.09), transparent 70%);
-}
-
-/* ── Glassmorphism ─────────────────────────────────────────────────── */
+/* ── Flat replacements for the old gradient utilities ──────────────── */
+/* Kept as class names so existing markup doesn't break — now FLAT. */
+.text-metallic { color: var(--color-gold); }
+.gold-vignette { background: none; }
 .glass {
-  background: rgba(26, 18, 6, 0.6);
-  backdrop-filter: blur(12px) saturate(1.4);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4);
-  border: 1px solid rgba(201, 162, 75, 0.15);
+  background: rgba(10, 8, 7, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--color-line);
 }
+.card-glow-border { border: 1px solid var(--color-line); }
+.btn-shimmer { position: relative; }
+.scroll-progress { display: none; }
 
-/* ── Animated gradient border (category cards) ─────────────────────── */
-@property --border-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
+/* ── Hairlines ─────────────────────────────────────────────────────── */
+.hairline { height: 1px; background: var(--color-line); }
+.rule { height: 1px; background: var(--color-rule); }
 
-.card-glow-border {
-  --border-angle: 0deg;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(var(--color-bg-raised), var(--color-bg-raised)) padding-box,
-    conic-gradient(
-      from var(--border-angle),
-      transparent 25%,
-      var(--color-gold) 50%,
-      transparent 75%
-    ) border-box;
-  transition: --border-angle var(--duration-slow) linear;
-}
-.card-glow-border:hover {
-  animation: borderSpin 2s linear infinite;
-}
-@keyframes borderSpin {
-  to { --border-angle: 360deg; }
-}
-
-/* ── Shimmer sweep (CTA button) ─────────────────────────────────────── */
-.btn-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.btn-shimmer::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    110deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.22) 50%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-  background-position: -200% 0;
-  transition: background-position 0s;
-}
-.btn-shimmer:hover::after {
-  background-position: 200% 0;
-  transition: background-position 0.6s ease;
-}
-
-/* ── Keyframes ─────────────────────────────────────────────────────── */
-
-/* Particle float */
-@keyframes floatUp {
-  0%   { transform: translateY(0) translateX(0);   opacity: 0; }
-  5%   { opacity: 0.85; }
-  50%  { transform: translateY(-45vh) translateX(var(--drift, 0px)); opacity: 0.5; }
-  95%  { opacity: 0.2; }
-  100% { transform: translateY(-92vh) translateX(var(--drift, 0px)); opacity: 0; }
-}
-
-/* Bloom breathe */
-@keyframes glowBreath {
-  0%, 100% { opacity: 0.08; transform: translateX(-50%) scale(1); }
-  50%       { opacity: 0.16; transform: translateX(-50%) scale(1.15); }
-}
-
-/* Shimmer text sweep */
-@keyframes shimmer {
-  0%   { background-position: 0%   50%; }
-  100% { background-position: 220% 50%; }
-}
-
-/* Orbit ring spin */
-@keyframes orbitSpin {
-  to { transform: rotate(360deg); }
-}
-@keyframes orbitSpinReverse {
-  to { transform: rotate(-360deg); }
-}
-
-/* Marquee scroll */
+/* ── Marquee ───────────────────────────────────────────────────────── */
 @keyframes marqueeScroll {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-
-/* Digit flip */
-@keyframes flipIn {
-  from { transform: perspective(400px) rotateX(-90deg); opacity: 0; }
-  to   { transform: perspective(400px) rotateX(0deg);   opacity: 1; }
-}
-@keyframes flipOut {
-  from { transform: perspective(400px) rotateX(0deg);  opacity: 1; }
-  to   { transform: perspective(400px) rotateX(90deg); opacity: 0; }
-}
-
-/* Letter reveal clip-path */
-@keyframes letterReveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to   { clip-path: inset(0 0% 0 0); }
-}
-
-/* Underline draw */
-@keyframes drawLine {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-
-/* Card entrance */
-@keyframes cardIn {
-  from { opacity: 0; transform: translateY(32px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
-}
-
-/* Gold pulse glow */
-@keyframes goldGlow {
-  0%, 100% { box-shadow: 0 0 0px 0px rgba(201, 162, 75, 0); }
-  50%       { box-shadow: 0 0 32px 4px rgba(201, 162, 75, 0.25); }
-}
-
-/* Fade up (generic) */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Animated trophy (the Award 3 master-brand showcase) ───────────── */
-@keyframes trophyFloat {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-14px); }
-}
-@keyframes trophyShine {
-  0%        { background-position: 240% 0; }
-  55%, 100% { background-position: -130% 0; }
-}
-.trophy-float {
-  animation: trophyFloat 5s ease-in-out infinite;
-}
-.trophy-shine {
-  background: linear-gradient(
-    115deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.5) 47%,
-    rgba(248, 231, 161, 0.85) 50%,
-    rgba(255, 255, 255, 0.5) 53%,
-    transparent 62%
-  );
-  background-size: 300% 100%;
-  mix-blend-mode: screen;
-  animation: trophyShine 6s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .trophy-float,
-  .trophy-shine {
-    animation: none;
-  }
-}
-
-/* ── Utility: content-visibility for offscreen sections ────────────── */
-.cv-auto {
-  content-visibility: auto;
-  contain-intrinsic-block-size: auto 600px;
-}
-
-/* ── Mobile nav transition using @starting-style ──────────────────── */
-.mobile-nav {
-  overflow: hidden;
-  max-height: 320px;
-  transition:
-    max-height var(--duration-slow) var(--ease-out-expo),
-    opacity var(--duration-base) ease;
-}
-.mobile-nav[data-closed] {
-  max-height: 0;
-  opacity: 0;
-}
-@starting-style {
-  .mobile-nav {
-    max-height: 0;
-    opacity: 0;
-  }
-}
-
-/* ── Marquee track ─────────────────────────────────────────────────── */
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marqueeScroll 22s linear infinite;
+  animation: marqueeScroll 30s linear infinite;
 }
-.marquee-track:hover {
-  animation-play-state: paused;
-}
+.marquee-track:hover { animation-play-state: paused; }
 
-/* ── Flip digit wrapper ────────────────────────────────────────────── */
-.flip-digit {
-  display: inline-block;
-  transition: none;
+/* ── Editorial link underline ──────────────────────────────────────── */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size var(--duration-base) var(--ease-out-expo);
 }
-.flip-digit.is-flipping {
-  animation: flipIn 0.35s var(--ease-out-expo) both;
+.link-underline:hover { background-size: 100% 1px; }
+
+/* ── Keyframes still referenced by existing components ─────────────── */
+/* (will be removed as each section is reskinned in later phases) */
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  100% { transform: translateY(-90vh); opacity: 0; }
 }
+@keyframes glowBreath {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.18; }
+}
+@keyframes orbitSpin { to { transform: rotate(360deg); } }
+@keyframes orbitSpinReverse { to { transform: rotate(-360deg); } }
+@keyframes drawLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes flipIn { from { transform: rotateX(-90deg); opacity: 0; } to { transform: rotateX(0); opacity: 1; } }
+
+.trophy-float { animation: none; }
+.trophy-shine { display: none; }
+
+.flip-digit { display: inline-block; }
+.flip-digit.is-flipping { animation: flipIn 0.35s var(--ease-out-expo) both; }
+
+.cv-auto { content-visibility: auto; contain-intrinsic-block-size: auto 600px; }
+
+.mobile-nav {
+  overflow: hidden;
+  max-height: 360px;
+  transition: max-height var(--duration-slow) var(--ease-out-expo), opacity var(--duration-base) ease;
+}
+.mobile-nav[data-closed] { max-height: 0; opacity: 0; }

@@ -1,7 +1,9 @@
 import { Hero } from "@/components/hero";
+import { AwardFeature } from "@/components/award-feature";
 import { BreedPillars } from "@/components/breed-pillars";
-import { AboutAward } from "@/components/about-award";
+import { LetterDirector } from "@/components/letter-director";
 import { Objectives } from "@/components/objectives";
+import { EventSchedule } from "@/components/event-schedule";
 import { HowToNominate } from "@/components/how-to-nominate";
 import { Categories } from "@/components/categories";
 import { WinnersGallery } from "@/components/winners-gallery";
@@ -13,9 +15,11 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <AwardFeature />
       <BreedPillars />
-      <AboutAward />
+      <LetterDirector />
       <Objectives />
+      <EventSchedule />
       <HowToNominate />
       <Categories />
       <WinnersGallery />
