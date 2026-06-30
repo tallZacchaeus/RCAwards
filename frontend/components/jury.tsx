@@ -1,16 +1,6 @@
 import { JURY } from "@/lib/site";
 import { Reveal } from "./reveal";
 
-function initials(name: string) {
-  return name
-    .replace(/^(Pastor|Dr\.|Sis\.|Mr\.|Mrs\.)\s+/i, "")
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
 export function MeetJury() {
   return (
     <section id="jury" className="surface-paper">
@@ -23,28 +13,30 @@ export function MeetJury() {
             </h2>
           </div>
           <p className="max-w-sm text-sm leading-relaxed text-slate">
-            A committee of leaders and elders scores every shortlisted nominee
-            against each category&apos;s criteria — the independent panel behind
-            every winner.
+            An independent committee of leaders and elders scores every shortlisted
+            nominee against each category&apos;s criteria — the panel behind every
+            winner.
           </p>
         </Reveal>
 
-        <Reveal stagger className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+        <Reveal className="mt-14 grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
           {JURY.map((j, i) => (
-            <figure key={i} className="group flex flex-col gap-4">
-              <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden border border-rule bg-card">
-                <span className="display text-5xl text-slate/40 transition-colors duration-500 group-hover:text-gold-deep">
-                  {initials(j.name)}
+            <div
+              key={i}
+              className="flex items-baseline gap-5 border-t border-rule py-5"
+            >
+              <span className="w-8 shrink-0 font-sans text-sm tabular-nums text-slate">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="flex flex-col">
+                <span className="font-serif text-xl text-graphite sm:text-2xl">
+                  {j.name}
                 </span>
-                <span className="absolute left-3 top-3 font-sans text-xs tabular-nums text-slate">
-                  {String(i + 1).padStart(2, "0")}
+                <span className="text-xs uppercase tracking-wider text-slate">
+                  {j.role}
                 </span>
               </div>
-              <figcaption className="flex flex-col gap-0.5 border-t border-rule pt-3">
-                <span className="font-serif text-lg text-graphite">{j.name}</span>
-                <span className="text-xs uppercase tracking-wider text-slate">{j.role}</span>
-              </figcaption>
-            </figure>
+            </div>
           ))}
         </Reveal>
       </div>
