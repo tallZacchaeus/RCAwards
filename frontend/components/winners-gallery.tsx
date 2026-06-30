@@ -1,5 +1,8 @@
 import { Reveal } from "./reveal";
 
+// Flip to `true` once real winner photos are in /brand/winners/ (winner1.jpg …).
+const PHOTOS_READY = false;
+
 const PAST_WINNERS = [
   { name: "RCCG Youth Office", year: "2025", category: "Organisation of the Year", image: "/brand/winners/winner1.jpg" },
   { name: "Dr. Adesuwa Rhodes", year: "2025", category: "Inspirational Leader", image: "/brand/winners/winner2.jpg" },
@@ -29,14 +32,18 @@ export function WinnersGallery() {
         <Reveal stagger className="mt-14 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {PAST_WINNERS.map((w, i) => (
             <figure key={i} className="group flex flex-col gap-4">
-              <div className="relative aspect-[4/5] overflow-hidden border border-line bg-bg-raised">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={w.image}
-                  alt={w.name}
-                  className="h-full w-full object-cover grayscale-[0.15] transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <span className="absolute left-3 top-3 font-sans text-xs tabular-nums text-ink/70">
+              <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden border border-line bg-bg-raised">
+                {PHOTOS_READY ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={w.image}
+                    alt={w.name}
+                    className="h-full w-full object-cover grayscale-[0.15] transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                ) : (
+                  <span className="eyebrow text-ink-muted/45">{w.category}</span>
+                )}
+                <span className="absolute left-3 top-3 font-sans text-xs tabular-nums text-ink/45">
                   {String(i + 1).padStart(2, "0")} / {w.year}
                 </span>
               </div>
