@@ -141,6 +141,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(200), unique=True, index=True)
+    name: Mapped[str | None] = mapped_column(String(200))
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.judge)
     active: Mapped[bool] = mapped_column(Boolean, default=True)

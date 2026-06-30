@@ -76,6 +76,7 @@ class TokenResponse(BaseModel):
 class UserOut(BaseModel):
     id: int
     email: str
+    name: Optional[str] = None
     role: str
     active: bool
 
@@ -85,6 +86,7 @@ class UserOut(BaseModel):
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
+    name: Optional[str] = None
     role: str = "judge"
 
 
@@ -120,12 +122,25 @@ class ScoreOut(BaseModel):
     total: int
 
 
+class CriterionAverage(BaseModel):
+    key: str
+    label: str
+    average: float
+
+
 class LeaderboardEntry(BaseModel):
     nomination_id: int
     nominee: Optional[str]
-    average_total: float
+    ranked_score: float
+    criteria: list[CriterionAverage]
     judge_count: int
+    panel_size: int
     status: str
+
+
+class CriterionOut(BaseModel):
+    key: str
+    label: str
 
 
 # --- Voting -------------------------------------------------------------------

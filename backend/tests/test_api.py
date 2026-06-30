@@ -120,12 +120,41 @@ def test_full_judging_flow(client, admin_headers, judge_headers):
     )
     assert patched.status_code == 200 and patched.json()["status"] == "shortlisted"
 
-    # Leaderboard reflects the score
+    # Leaderboard reflects the score: per-criterion averages + a ranked score.
     board = client.get(
         "/admin/categories/creche-of-the-year/leaderboard", headers=admin_headers
     ).json()
     entry = next(e for e in board if e["nomination_id"] == nom_id)
-    assert entry["average_total"] == 17.0 and entry["judge_count"] == 1
+    assert entry["judge_count"] == 1
+    assert entry["ranked_score"] > 0 and entry["panel_size"] >= 1
+    by_key = {c["key"]: c["average"] for c in entry["criteria"]}
+    assert by_key["staff_child_ratio"] == 8.0 and by_key["cleanliness_safety"] == 9.0
+
+
+def test_category_criteria_endpoint(client, admin_headers):
+    crit = client.get(
+        "/admin/categories/creche-of-the-year/criteria", headers=admin_headers
+    ).json()
+    keys = {c["key"] for c in crit}
+    # The official judging criteria are the form's 1-10 fields.
+    assert "staff_child_ratio" in keys and "cleanliness_safety" in keys
+    assert all("label" in c for c in crit)
+
+
+def test_judging_sheet_export(client, admin_headers, judge_headers):
+    created = client.post("/nominations", json=valid_creche_payload()).json()
+    client.post(
+        f"/admin/nominations/{created['id']}/scores",
+        json={"criteria": {"staff_child_ratio": 7}},
+        headers=judge_headers,
+    )
+    resp = client.get(
+        "/admin/categories/creche-of-the-year/judging-sheet.csv", headers=admin_headers
+    )
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("text/csv")
+    assert "NOMINEE,CRITERIA" in resp.text
+    assert "Ranked Score" in resp.text
 
 
 def test_csv_export(client, admin_headers):

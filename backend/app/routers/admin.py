@@ -22,7 +22,10 @@ from ..models import (
     UserRole,
     Vote,
 )
+from ..judging import judging_criteria, score_nominee
 from ..schemas.api import (
+    CriterionAverage,
+    CriterionOut,
     FileRef,
     LeaderboardEntry,
     NominationDetail,
@@ -156,41 +159,125 @@ def submit_score(
     )
 
 
+def _panel_size(session: Session) -> int:
+    return int(
+        session.scalar(
+            select(func.count(User.id)).where(
+                User.active, User.role.in_([UserRole.judge, UserRole.admin])
+            )
+        )
+        or 0
+    )
+
+
+def _category_or_404(session: Session, slug: str) -> Category:
+    category = session.scalar(select(Category).where(Category.slug == slug))
+    if category is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return category
+
+
+@router.get("/categories/{slug}/criteria", response_model=list[CriterionOut])
+def category_criteria(
+    slug: str,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_staff),
+) -> list[CriterionOut]:
+    """The official judging criteria for a category (its 1-10 form fields)."""
+    category = _category_or_404(session, slug)
+    return [CriterionOut(key=c.key, label=c.label) for c in judging_criteria(category.form_schema)]
+
+
 @router.get("/categories/{slug}/leaderboard", response_model=list[LeaderboardEntry])
 def leaderboard(
     slug: str,
     session: Session = Depends(get_session),
     _: User = Depends(require_staff),
 ) -> list[LeaderboardEntry]:
-    """Rank a category's nominations by average judge total (to shortlist top 3)."""
-    category = session.scalar(select(Category).where(Category.slug == slug))
-    if category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
+    """Rank a category's nominations by Ranked Score, with per-criterion averages."""
+    category = _category_or_404(session, slug)
+    criteria = judging_criteria(category.form_schema)
+    labels = {c.key: c.label for c in criteria}
+    panel = _panel_size(session)
 
-    stmt = (
-        select(
-            Nomination,
-            func.avg(Score.total).label("avg_total"),
-            func.count(Score.id).label("judge_count"),
-        )
-        .outerjoin(Score, Score.nomination_id == Nomination.id)
-        .where(Nomination.category_id == category.id)
-        .group_by(Nomination.id)
-        .order_by(func.coalesce(func.avg(Score.total), 0).desc())
+    nominations = list(
+        session.scalars(select(Nomination).where(Nomination.category_id == category.id)).all()
     )
-
-    entries = []
-    for nomination, avg_total, judge_count in session.execute(stmt).all():
+    entries: list[LeaderboardEntry] = []
+    for nom in nominations:
+        scores = session.scalars(select(Score).where(Score.nomination_id == nom.id)).all()
+        result = score_nominee([s.criteria for s in scores], panel)
         entries.append(
             LeaderboardEntry(
-                nomination_id=nomination.id,
-                nominee=summarize_submission(nomination.answers)["nominee_name"],
-                average_total=round(float(avg_total), 2) if avg_total is not None else 0.0,
-                judge_count=int(judge_count),
-                status=nomination.status.value,
+                nomination_id=nom.id,
+                nominee=summarize_submission(nom.answers)["nominee_name"],
+                ranked_score=result.ranked_score,
+                criteria=[
+                    CriterionAverage(
+                        key=c.key,
+                        label=c.label,
+                        average=result.criteria_averages.get(c.key, 0.0),
+                    )
+                    for c in criteria
+                ]
+                or [
+                    CriterionAverage(key=k, label=labels.get(k, k), average=v)
+                    for k, v in result.criteria_averages.items()
+                ],
+                judge_count=result.judge_count,
+                panel_size=panel,
+                status=nom.status.value,
             )
         )
+    entries.sort(key=lambda e: e.ranked_score, reverse=True)
     return entries
+
+
+@router.get("/categories/{slug}/judging-sheet.csv")
+def judging_sheet_csv(
+    slug: str,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> StreamingResponse:
+    """Reproduce the committee's judging workbook for a category from live scores:
+    a nominee × criterion matrix with one column per judge, plus average + ranked score."""
+    category = _category_or_404(session, slug)
+    criteria = judging_criteria(category.form_schema)
+    panel = _panel_size(session)
+
+    judges = list(
+        session.scalars(
+            select(User)
+            .where(User.active, User.role.in_([UserRole.judge, UserRole.admin]))
+            .order_by(User.id)
+        ).all()
+    )
+    judge_label = {j.id: (j.name or j.email) for j in judges}
+
+    nominations = list(
+        session.scalars(select(Nomination).where(Nomination.category_id == category.id)).all()
+    )
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["NOMINEE", "CRITERIA", *[judge_label[j.id] for j in judges], "Average", "Ranked Score"])
+
+    for nom in nominations:
+        scores = session.scalars(select(Score).where(Score.nomination_id == nom.id)).all()
+        by_judge = {s.judge_id: s.criteria for s in scores}
+        result = score_nominee([s.criteria for s in scores], panel)
+        nominee = summarize_submission(nom.answers)["nominee_name"] or f"Nomination #{nom.id}"
+        writer.writerow([nominee, "", *["" for _ in judges], "", result.ranked_score])
+        for c in criteria:
+            row_scores = [by_judge.get(j.id, {}).get(c.key, "") for j in judges]
+            writer.writerow(["", c.label, *row_scores, result.criteria_averages.get(c.key, ""), ""])
+
+    buffer.seek(0)
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=judging-sheet-{slug}.csv"},
+    )
 
 
 # --- Export (admin only) ------------------------------------------------------
@@ -398,7 +485,12 @@ def create_user(
         role = UserRole(payload.role)
     except ValueError:
         raise HTTPException(status_code=422, detail="role must be 'admin' or 'judge'")
-    user = User(email=payload.email.lower(), password_hash=hash_password(payload.password), role=role)
+    user = User(
+        email=payload.email.lower(),
+        name=payload.name,
+        password_hash=hash_password(payload.password),
+        role=role,
+    )
     session.add(user)
     session.commit()
     session.refresh(user)

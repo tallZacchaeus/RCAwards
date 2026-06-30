@@ -87,11 +87,15 @@ export type NominationDetail = NominationListItem & {
   files: FileRef[];
 };
 
+export type CriterionAverage = { key: string; label: string; average: number };
+
 export type LeaderboardEntry = {
   nomination_id: number;
   nominee: string | null;
-  average_total: number;
+  ranked_score: number;
+  criteria: CriterionAverage[];
   judge_count: number;
+  panel_size: number;
   status: string;
 };
 
@@ -189,15 +193,29 @@ export async function updateSettings(
   );
 }
 
-export async function downloadCsv(category?: string): Promise<void> {
-  const q = category ? `?category=${category}` : "";
-  const res = await adminFetch(`/admin/nominations/export/csv${q}`);
+async function downloadBlob(res: Response, filename: string): Promise<void> {
   if (!res.ok) throw new Error("Export failed");
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `nominations-${category || "all"}.csv`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+export async function downloadCsv(category?: string): Promise<void> {
+  const q = category ? `?category=${category}` : "";
+  await downloadBlob(
+    await adminFetch(`/admin/nominations/export/csv${q}`),
+    `nominations-${category || "all"}.csv`
+  );
+}
+
+/** Download the committee judging sheet (nominee × judge × criterion) for a category. */
+export async function downloadJudgingSheet(slug: string): Promise<void> {
+  await downloadBlob(
+    await adminFetch(`/admin/categories/${slug}/judging-sheet.csv`),
+    `judging-sheet-${slug}.csv`
+  );
 }
