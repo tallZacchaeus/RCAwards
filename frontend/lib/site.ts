@@ -18,8 +18,26 @@ export const NAV = [
   { label: "About", href: "/#about" },
   { label: "Categories", href: "/#categories" },
   { label: "Winners", href: "/#winners" },
+  { label: "Jury", href: "/#jury" },
   { label: "Vote", href: "/vote" },
   { label: "Nominate", href: "/nominate" },
+];
+
+/** The 2025 judging panel (from the committee judging sheet). Add photos to
+    /brand/jury/<slug>.jpg later; the cards fall back to initials. */
+export const JURY = [
+  { name: "Pastor Dare", role: "Chair of Jury" },
+  { name: "Pastor Osoba", role: "Judging Committee" },
+  { name: "Pastor Kunle", role: "Judging Committee" },
+  { name: "Pastor Isaiah", role: "Judging Committee" },
+  { name: "Dr. Peter", role: "Judging Committee" },
+  { name: "Pastor Olumide", role: "Judging Committee" },
+  { name: "Pastor Cole", role: "Judging Committee" },
+  { name: "Sis. Tolu", role: "Judging Committee" },
+  { name: "Oluwafunmilola", role: "Judging Committee" },
+  { name: "Sis. Jumoke", role: "Judging Committee" },
+  { name: "Sis. Tosin", role: "Judging Committee" },
+  { name: "Pastor Femi", role: "Judging Committee" },
 ];
 
 /** City Breed's five identity pillars. */
