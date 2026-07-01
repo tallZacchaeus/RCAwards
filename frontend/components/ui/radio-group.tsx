@@ -27,7 +27,7 @@ function RadioGroupItem({
   return (
     <label
       htmlFor={id}
-      className="group flex cursor-pointer items-center gap-3 rounded-xl border border-line bg-bg px-4 py-2.5 text-sm text-ink transition-colors hover:border-gold/40 has-[[data-state=checked]]:border-gold/60 has-[[data-state=checked]]:bg-gold/5"
+      className="group flex cursor-pointer items-center gap-3 rounded-lg border border-line bg-bg px-4 py-2.5 text-sm text-ink transition-colors hover:border-gold/40 has-[[data-state=checked]]:border-gold/60 has-[[data-state=checked]]:bg-gold/5"
     >
       <RadioGroupPrimitive.Item
         id={id}
