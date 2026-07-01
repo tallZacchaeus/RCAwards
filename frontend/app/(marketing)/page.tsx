@@ -2,7 +2,6 @@ import { Hero } from "@/components/hero";
 import { AwardFeature } from "@/components/award-feature";
 import { Stats } from "@/components/stats";
 import { BreedPillars } from "@/components/breed-pillars";
-import { LetterDirector } from "@/components/letter-director";
 import { Objectives } from "@/components/objectives";
 import { HowToNominate } from "@/components/how-to-nominate";
 import { Categories } from "@/components/categories";
@@ -19,7 +18,6 @@ export default function Home() {
       <AwardFeature />
       <Stats />
       <BreedPillars />
-      <LetterDirector />
       <Objectives />
       <HowToNominate />
       <Categories />

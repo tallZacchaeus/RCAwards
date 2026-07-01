@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getCategories } from "@/lib/api";
 import { GROUP_LABELS, type CategorySummary } from "@/lib/site";
-import { SectionHeading } from "@/components/section-heading";
 import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
@@ -21,59 +20,68 @@ export default async function NominatePage() {
   })).filter((g) => g.items.length > 0);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-28 pt-36 sm:px-8">
-      <SectionHeading
-        eyebrow="2026 Nominations"
-        title="Choose a category"
-        subtitle="Recognise excellence by nominating your most deserving individuals and organisations. You can nominate for as many categories as you like."
-      />
+    <main className="surface-paper min-h-screen">
+      <div className="mx-auto max-w-7xl px-5 pb-28 pt-36 sm:px-8">
+        <Reveal className="flex flex-col gap-4">
+          <span className="eyebrow text-gold-deep">2026 Nominations</span>
+          <h1 className="display max-w-3xl text-[clamp(2.5rem,6vw,5rem)] text-graphite">
+            choose a category
+          </h1>
+          <p className="max-w-xl text-base leading-relaxed text-slate">
+            Recognise excellence by nominating your most deserving individuals and
+            organisations. You can nominate for as many categories as you like.
+          </p>
+        </Reveal>
 
-      <div className="mt-16 flex flex-col gap-14">
-        {grouped.map((g) => (
-          <div key={g.group}>
-            <div className="mb-6 flex items-center gap-4">
-              <span className="font-display text-sm uppercase tracking-[0.3em] text-gold">
-                {g.label}
-              </span>
-              <span className="hairline flex-1" />
-            </div>
-            <Reveal stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {g.items.map((cat) => (
-                <PickerCard key={cat.slug} category={cat} />
-              ))}
-            </Reveal>
-          </div>
-        ))}
+        <div className="mt-16 flex flex-col gap-16">
+          {grouped.map((g, gi) => {
+            const start = grouped
+              .slice(0, gi)
+              .reduce((sum, prev) => sum + prev.items.length, 0);
+            return (
+              <div key={g.group}>
+                <div className="mb-2 flex items-baseline justify-between">
+                  <span className="eyebrow text-slate">{g.label}</span>
+                  <span className="text-xs text-slate">
+                    {String(g.items.length).padStart(2, "0")}
+                  </span>
+                </div>
+                <Reveal>
+                  <ul>
+                    {g.items.map((cat, i) => (
+                      <PickerRow key={cat.slug} index={start + i + 1} category={cat} />
+                    ))}
+                  </ul>
+                </Reveal>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
 
-import { CardTiltGlow } from "@/components/card-tilt-glow";
-
-function PickerCard({ category }: { category: CategorySummary }) {
+function PickerRow({ index, category }: { index: number; category: CategorySummary }) {
   return (
-    <Link href={`/nominate/${category.slug}`} className="block h-full">
-      <CardTiltGlow
-        className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-line bg-bg-raised/50 p-6 duration-500 hover:border-gold/40 hover:bg-bg-elevated h-full"
+    <li>
+      <Link
+        href={`/nominate/${category.slug}`}
+        className="group flex items-center gap-5 border-t border-rule py-5 sm:gap-8"
       >
-        {/* Bottom sweep accent */}
-        <div
-          className="absolute bottom-0 inset-x-0 h-px origin-left scale-x-0 bg-gold/40 transition-transform duration-500 group-hover:scale-x-100"
-          aria-hidden="true"
-        />
-        <h3 className="font-serif text-xl leading-snug text-ink transition-colors group-hover:text-gold-hi">
-          {category.name}
-        </h3>
-        <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-ink-muted">
-          {category.description}
-        </p>
-        <span className="mt-2 flex items-center gap-1 text-xs uppercase tracking-[0.25em] text-gold opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
-          Nominate →
+        <span className="w-8 shrink-0 font-sans text-sm tabular-nums text-slate">
+          {String(index).padStart(2, "0")}
         </span>
-      </CardTiltGlow>
-    </Link>
+        <span className="display flex-1 text-[clamp(1.5rem,3.6vw,2.75rem)] text-graphite transition-colors group-hover:text-gold-deep">
+          {category.name.toLowerCase()}
+        </span>
+        <span className="hidden max-w-xs shrink truncate text-sm text-slate md:block">
+          {category.description}
+        </span>
+        <span className="shrink-0 text-gold-deep opacity-0 transition-opacity group-hover:opacity-100">
+          →
+        </span>
+      </Link>
+    </li>
   );
 }
-
-

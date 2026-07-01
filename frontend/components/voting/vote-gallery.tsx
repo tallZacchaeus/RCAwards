@@ -98,37 +98,25 @@ export function VoteGallery({
             <article
               key={n.id}
               className={cn(
-                "group relative flex flex-col gap-5 overflow-hidden rounded-2xl border p-6 transition-all duration-500",
+                "group relative flex flex-col gap-5 border p-6 transition-colors duration-300",
                 isVoted
-                  ? "border-gold/60 bg-bg-elevated shadow-[0_0_40px_-12px_rgba(201,162,75,0.35)]"
-                  : "border-line bg-bg-raised/50 hover:border-gold/30 hover:bg-bg-elevated hover:-translate-y-1 hover:shadow-[0_8px_32px_-8px_rgba(201,162,75,0.15)]"
+                  ? "border-gold/60 bg-bg-elevated"
+                  : "border-line bg-bg-raised/50 hover:border-gold/40"
               )}
             >
               {/* Winner badge */}
               {n.is_winner && (
-                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-[10px] uppercase tracking-wider text-gold-hi">
+                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border border-gold/30 px-2.5 py-1 text-[10px] uppercase tracking-wider text-gold-hi">
                   <Crown className="h-3 w-3" /> Winner
                 </span>
-              )}
-
-              {/* Gold corner glow when voted */}
-              {isVoted && (
-                <div
-                  className="pointer-events-none absolute inset-0 rounded-2xl"
-                  style={{
-                    background:
-                      "radial-gradient(60% 50% at 50% 0%, rgba(201,162,75,0.1), transparent)",
-                  }}
-                  aria-hidden="true"
-                />
               )}
 
               {/* Avatar + info */}
               <div className="relative flex items-center gap-4">
                 <div
                   className={cn(
-                    "flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-bg-elevated transition-all duration-500",
-                    isVoted ? "border-gold/60 shadow-[0_0_16px_-4px_rgba(201,162,75,0.5)]" : "border-gold/20"
+                    "flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-bg-elevated transition-colors duration-300",
+                    isVoted ? "border-gold/60" : "border-gold/20"
                   )}
                 >
                   {n.photo_url ? (
@@ -153,7 +141,7 @@ export function VoteGallery({
                 <div className="flex flex-col gap-2">
                   <div className="relative h-1.5 overflow-hidden rounded-full bg-bg-elevated">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-gold-deep to-gold-hi transition-all duration-700"
+                      className="h-full rounded-full bg-gold transition-all duration-700"
                       style={{ width: `${share}%` }}
                     />
                   </div>

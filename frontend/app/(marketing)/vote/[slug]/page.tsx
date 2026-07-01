@@ -37,11 +37,11 @@ export default async function VoteCategoryPage({ params }: Props) {
       ) : (
         <>
           <header className="mb-12 flex flex-col gap-4 border-b border-line pb-10">
-            <span className="font-display text-xs uppercase tracking-[0.3em] text-gold">
+            <span className="eyebrow text-gold">
               {GROUP_LABELS[category.group] ?? category.group} · Public Vote
             </span>
-            <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
-              {category.name}
+            <h1 className="display text-[clamp(2rem,5vw,3.5rem)] text-ink">
+              {category.name.toLowerCase()}
             </h1>
             <p className="text-base leading-relaxed text-ink-muted">
               {category.description}
