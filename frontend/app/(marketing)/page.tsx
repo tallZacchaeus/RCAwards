@@ -6,6 +6,7 @@ import { Objectives } from "@/components/objectives";
 import { HowToNominate } from "@/components/how-to-nominate";
 import { Categories } from "@/components/categories";
 import { WinnersGallery } from "@/components/winners-gallery";
+import { Gallery } from "@/components/gallery";
 import { MeetJury } from "@/components/jury";
 import { Sponsors } from "@/components/sponsors";
 import { Faq } from "@/components/faq";
@@ -22,6 +23,7 @@ export default function Home() {
       <HowToNominate />
       <Categories />
       <WinnersGallery />
+      <Gallery />
       <MeetJury />
       <Sponsors />
       <Faq />
