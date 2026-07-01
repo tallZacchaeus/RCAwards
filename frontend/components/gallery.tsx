@@ -2,8 +2,8 @@ import { Reveal } from "./reveal";
 
 // Curated, web-optimized selection from the 2025 shoot (public/brand/photos/gallery).
 const IMAGES = [
-  "g01", "g02", "g03", "g04", "g05", "g06", "g07", "g08",
-  "g09", "g11", "g12", "g13", "g14", "g15", "g16",
+  "g01", "g02", "g03", "g04", "g05", "g06", "g07", "g08", "g09", "g10",
+  "g11", "g12", "g13", "g14", "g15", "g16", "g17", "g18", "g19", "g20",
 ].map((n) => `/brand/photos/gallery/${n}.jpg`);
 
 export function Gallery() {
