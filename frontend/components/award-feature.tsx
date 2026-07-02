@@ -16,7 +16,7 @@ export function AwardFeature() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/brand/photos/feature.jpg"
-                alt="Guests on the red carpet at the 2025 ceremony"
+                alt="A guest at the 2025 ceremony"
                 className="h-full w-full object-cover"
               />
               <span className="absolute left-4 top-4 eyebrow text-white/80 mix-blend-difference">
@@ -24,7 +24,7 @@ export function AwardFeature() {
               </span>
             </div>
             <figcaption className="flex items-center justify-between text-xs text-slate">
-              <span>The champions of 2025</span>
+              <span>Scenes from the 2025 ceremony</span>
               <span>Fig. 01</span>
             </figcaption>
           </figure>
