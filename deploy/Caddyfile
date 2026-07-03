@@ -1,0 +1,27 @@
+# Caddy fronts everything on one domain with automatic Let's Encrypt HTTPS.
+#
+#   https://awards.thecitybreed.org/        → Next.js frontend
+#   https://awards.thecitybreed.org/api/*   → FastAPI backend (prefix stripped)
+#   https://awards.thecitybreed.org/uploads/* → backend upload storage
+#
+# SITE_DOMAIN comes from the compose environment.
+
+{$SITE_DOMAIN} {
+	encode gzip zstd
+
+	# API — handle_path strips /api before proxying, so /api/categories
+	# reaches the backend as /categories.
+	handle_path /api/* {
+		reverse_proxy backend:8000
+	}
+
+	# Uploaded nomination evidence (images/PDFs) served by the backend.
+	handle /uploads/* {
+		reverse_proxy backend:8000
+	}
+
+	# Everything else is the Next.js app.
+	handle {
+		reverse_proxy frontend:3000
+	}
+}

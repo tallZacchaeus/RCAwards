@@ -1,0 +1,75 @@
+# Production stack: MariaDB + FastAPI backend + Next.js frontend + Caddy (auto-HTTPS).
+# Usage on the VPS:
+#   cp .env.production.example .env   # then fill in real secrets
+#   docker compose -f docker-compose.prod.yml up -d --build
+# Full runbook: DEPLOY.md
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set in .env}
+      MARIADB_DATABASE: rcawards
+      MARIADB_USER: rcawards
+      MARIADB_PASSWORD: ${DB_PASSWORD:?set in .env}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: mysql+pymysql://rcawards:${DB_PASSWORD}@db:3306/rcawards
+      JWT_SECRET: ${JWT_SECRET:?set in .env}
+      EDITION_YEAR: ${EDITION_YEAR:-2026}
+      CORS_ORIGINS: '["https://${SITE_DOMAIN}"]'
+      UPLOAD_DIR: /data/uploads
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the client bundle — the public URL the browser calls.
+        NEXT_PUBLIC_API_BASE: https://${SITE_DOMAIN}/api
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?set in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  db-data:
+  uploads:
+  caddy-data:
+  caddy-config:

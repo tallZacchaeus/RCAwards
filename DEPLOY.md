@@ -1,93 +1,178 @@
-# Deployment & launch runbook
+# Deploying RCAwards to the Hostinger VPS
 
-The platform is two deployables: the **FastAPI backend** (+ MySQL) and the
-**Next.js frontend**. This guide covers production configuration, the database,
-and the launch checklist.
+Production stack (all in Docker Compose): **MariaDB 11 → FastAPI backend → Next.js
+frontend → Caddy** (reverse proxy with automatic Let's Encrypt HTTPS).
 
-## 1. Database (MySQL 8)
+Public URL layout — one domain, no CORS headaches:
 
-```sql
-CREATE DATABASE rcawards CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'rcawards'@'%' IDENTIFIED BY '<strong-password>';
-GRANT ALL PRIVILEGES ON rcawards.* TO 'rcawards'@'%';
-FLUSH PRIVILEGES;
-```
-
-Use a managed MySQL (PlanetScale, RDS, Railway, etc.) in production. The
-connection string is `mysql+pymysql://rcawards:<password>@<host>:3306/rcawards`.
-
-## 2. Backend
-
-Environment (see `backend/.env.example`):
-
-| Variable | Production value |
+| URL | Serves |
 |---|---|
-| `ENVIRONMENT` | `production` |
-| `DATABASE_URL` | your MySQL URL (not the `root:root` default) |
-| `JWT_SECRET` | a random string **≥ 32 bytes** (`openssl rand -hex 32`) |
-| `CORS_ORIGINS` | `["https://<your-frontend-domain>"]` |
-| `UPLOAD_DIR` / storage | see step 4 |
+| `https://awards.thecitybreed.org/` | Next.js site |
+| `https://awards.thecitybreed.org/api/*` | FastAPI (prefix stripped by Caddy) |
+| `https://awards.thecitybreed.org/uploads/*` | Nomination evidence files |
+| `https://awards.thecitybreed.org/api/docs` | Interactive API docs |
 
-> With `ENVIRONMENT=production`, the app **refuses to start** if `JWT_SECRET` is
-> weak or `DATABASE_URL` still uses the default root credentials — a deliberate
-> guard.
+Files that make up the deployment:
 
-Deploy steps:
+- `docker-compose.prod.yml` — the whole stack
+- `deploy/Caddyfile` — routing + HTTPS
+- `.env.production.example` — template for the server's `.env`
+- `backend/Dockerfile`, `frontend/Dockerfile`
+
+---
+
+## 1. What to buy (once)
+
+- **Hostinger VPS — KVM 2** (2 vCPU, 8 GB RAM, 100 GB NVMe). KVM 1 (4 GB) can run
+  the stack, but the Next.js production build is memory-hungry; 8 GB gives
+  comfortable headroom for builds and event-night traffic.
+- **Domain**: already owned (`thecitybreed.org`, DNS on Cloudflare) — nothing to buy.
+- **Hostinger Mail (optional)**: only needed when the app should send email
+  (see §8). ~$0.99/mo for one mailbox.
+
+During VPS checkout, pick the **Ubuntu 24.04 with Docker** template and add your
+SSH public key. Choose the datacenter closest to your audience (Europe is
+usually the best latency compromise for Nigeria).
+
+## 2. First login & basic hardening
 
 ```bash
-pip install -r requirements.txt
-alembic upgrade head                      # create/upgrade schema
-python -m app.seed.loader                 # load the 23 categories (idempotent)
-python -m app.manage create-admin --email you@org.com --password '<strong>'
-uvicorn app.main:app --host 0.0.0.0 --port 8000   # behind gunicorn/uvicorn workers
+ssh root@YOUR_VPS_IP
+
+# Firewall: SSH + web only
+ufw allow OpenSSH && ufw allow 80/tcp && ufw allow 443/tcp && ufw --force enable
+
+# Keep the OS patched
+apt update && apt upgrade -y
 ```
 
-Run it as a container (Fly.io, Render, Railway, a VPS) or behind a process
-manager. Put it behind HTTPS (the reverse proxy / platform handles TLS). The API
-already sets security headers and per-IP rate limiting on public writes.
+Hostinger's panel includes **weekly auto-backups / snapshots** — turn them on
+(VPS → Backups). Take a manual snapshot before major changes.
 
-## 3. Frontend (Vercel recommended)
+## 3. Point DNS at the VPS
 
-Environment (see `frontend/.env.example`):
+In **Cloudflare** (where thecitybreed.org's DNS lives), add:
 
-| Variable | Value |
-|---|---|
-| `NEXT_PUBLIC_API_BASE` | `https://<your-api-domain>` |
-| `NEXT_PUBLIC_SITE_URL` | `https://<your-frontend-domain>` |
+| Type | Name | Content | Proxy |
+|---|---|---|---|
+| A | `awards` | YOUR_VPS_IP | **DNS only (grey cloud)** |
+
+Grey-cloud is required so Caddy can obtain the Let's Encrypt certificate
+directly. (You can switch to proxied later with Cloudflare SSL mode "Full
+(strict)"; grey-cloud is the simple, correct default.)
+
+## 4. Get the code onto the VPS
 
 ```bash
-npm ci && npm run build      # CI does this on every push
+git clone https://github.com/tallZacchaeus/RCAwards.git /opt/rcawards
+cd /opt/rcawards
 ```
 
-On Vercel: import the repo, set **Root Directory = `frontend`**, add the two env
-vars, deploy. The marketing pages are statically generated (ISR); the form,
-voting, and admin routes render on demand.
+If the repo is private, create a fine-grained GitHub **personal access token**
+(read-only on this repo) and use it as the password when prompted, or add the
+VPS's SSH key as a deploy key.
 
-## 4. File uploads (storage)
+## 5. Configure secrets
 
-Dev stores uploads on local disk (`UPLOAD_DIR`). For production, swap
-`app/storage.py:save_upload` for an S3/R2/Blob implementation (the `StoredFile`
-return shape is the only contract the routers depend on) and serve files from the
-bucket/CDN instead of the local `/uploads` mount.
+```bash
+cp .env.production.example .env
+openssl rand -hex 32      # → JWT_SECRET
+openssl rand -base64 24   # → DB_ROOT_PASSWORD (run again for DB_PASSWORD)
+nano .env                 # paste the generated values
+```
 
-## 5. Go-live checklist
+`.env` is git-ignored — it never leaves the server. With `ENVIRONMENT=production`
+the backend **refuses to start** on weak secrets — a deliberate guard.
 
-- [ ] MySQL provisioned; `alembic upgrade head` run; categories seeded.
-- [ ] First admin created; extra judges added via the console or `manage create-user`.
-- [ ] `ENVIRONMENT=production`, strong `JWT_SECRET`, real `DATABASE_URL`, correct `CORS_ORIGINS`.
-- [ ] Frontend env points at the production API and site URL.
-- [ ] Storage backend wired for uploads (step 4) if nominations use file uploads.
-- [ ] Custom domain + HTTPS on both apps.
+## 6. Build and launch
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+First build takes several minutes (Next.js compile). Then initialise the
+database — migrations, category seeds, and your admin login:
+
+```bash
+docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
+docker compose -f docker-compose.prod.yml exec backend python -m app.seed.loader
+docker compose -f docker-compose.prod.yml exec backend \
+  python -m app.manage create-admin --email you@thecitybreed.org --password 'a-strong-password'
+```
+
+## 7. Verify & go-live checklist
+
+```bash
+curl https://awards.thecitybreed.org/api/health   # {"status":"ok",...}
+```
+
+- [ ] Migrations run, categories seeded, first admin created (extra judges via
+      `python -m app.manage create-user` or Admin → Users).
+- [ ] Homepage loads over HTTPS; certificate is valid.
+- [ ] Smoke test: submit a nomination **with a file upload**, log into `/admin`,
+      score it, shortlist a nominee, cast a vote.
 - [ ] Set the voting window in **Admin → Settings** (opens/closes, results visibility).
-- [ ] Smoke test: submit a nomination, log into `/admin`, score it, shortlist a
-      nominee, cast a vote.
-- [ ] (Optional) Add a managed captcha (Turnstile/hCaptcha) on top of the honeypot
-      for the public write endpoints if spam becomes an issue.
-- [ ] Database backups enabled on the managed MySQL.
+- [ ] Hostinger snapshots on; nightly DB dump cron added (§10).
+- [ ] (Optional) Managed captcha (Turnstile/hCaptcha) on public writes if spam
+      becomes an issue — a honeypot ships already.
 
-## 6. What's intentionally deferred
+If the certificate fails: check DNS propagation (`dig awards.thecitybreed.org`)
+and that the Cloudflare record is grey-cloud.
 
-- **Captcha**: a honeypot ships now; a key-based captcha is a drop-in add if needed.
-- **Email**: newsletter signups are stored in `subscribers`; wiring an ESP
-  (Resend/Mailchimp) is a follow-up.
-- **Object storage**: see step 4.
+## 8. Email (Hostinger SMTP)
+
+The backend has an SMTP mailer (`backend/app/mailer.py`) configured by the
+`SMTP_*` variables in `.env`. To enable it:
+
+1. Buy a Hostinger Mail plan and create a mailbox, e.g. `awards@thecitybreed.org`.
+2. **Caution:** attaching Hostinger Mail to `thecitybreed.org` means changing the
+   domain's **MX records in Cloudflare**, and the domain already has MX records
+   pointing at an existing mail/forwarding service. Changing them affects any
+   existing addresses — confirm with whoever manages the current email first.
+   (Alternative: host the mailbox on another domain you own.)
+3. Fill `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` in `.env`, then
+   `docker compose -f docker-compose.prod.yml up -d backend` to reload.
+
+Nothing calls the mailer yet — nomination-confirmation / admin-alert emails can
+be wired onto it whenever you want them.
+
+## 9. Updating the site
+
+```bash
+cd /opt/rcawards
+git pull
+docker compose -f docker-compose.prod.yml up -d --build
+# Only when a release includes new migrations:
+docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
+```
+
+## 10. Backups
+
+Hostinger's weekly snapshots cover the whole VM (including the `uploads` and
+database volumes). For point-in-time database dumps, add a nightly cron
+(`mkdir -p /root/backups`, then `crontab -e`):
+
+```cron
+0 3 * * * cd /opt/rcawards && docker compose -f docker-compose.prod.yml exec -T db \
+  sh -c 'mariadb-dump -u root -p"$MARIADB_ROOT_PASSWORD" rcawards' | gzip \
+  > /root/backups/rcawards-$(date +\%F).sql.gz
+```
+
+## Troubleshooting
+
+- **Logs:** `docker compose -f docker-compose.prod.yml logs -f backend` (or
+  `frontend`, `caddy`, `db`).
+- **Backend exits with "Insecure production configuration":** fix `JWT_SECRET` /
+  `DB_PASSWORD` in `.env` — the guard is doing its job.
+- **502 from Caddy:** the backend/frontend container is still starting or
+  crashed — check its logs.
+- **Frontend build killed (OOM) on a small plan:** add swap:
+  `fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile`
+
+## Deferred by design
+
+- **Object storage**: uploads live on the VPS disk via a Docker volume — fine at
+  this scale. To move to S3/R2 later, swap `app/storage.py:save_upload` (the
+  `StoredFile` return shape is the only contract the routers depend on).
+- **Transactional email flows**: the mailer exists; individual emails
+  (nomination confirmations, admin alerts) are a small follow-up.

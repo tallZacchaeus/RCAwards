@@ -47,6 +47,14 @@ class Settings(BaseSettings):
     rate_limit_requests: int = 20
     rate_limit_window_seconds: int = 60
 
+    # SMTP for outgoing email (optional — unset disables email sending).
+    # Hostinger: smtp.hostinger.com, port 465 (implicit TLS), login = full mailbox address.
+    smtp_host: str = ""
+    smtp_port: int = 465
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""  # defaults to smtp_user when empty
+
     @property
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
