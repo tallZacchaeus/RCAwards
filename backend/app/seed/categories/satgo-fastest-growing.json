@@ -13,8 +13,7 @@
         {"key": "nominator_full_name", "label": "Full Name", "type": "short_text", "required": true},
         {"key": "nominator_contact", "label": "Phone Number / Email Address", "type": "short_text", "required": true},
         {"key": "affiliated", "label": "Are you affiliated with an RCCG Youth Province?", "type": "yes_no", "required": true},
-        {"key": "relationship", "label": "Relationship With Youth Province", "type": "multiple_choice", "required": true, "allow_other": true,
-          "options": ["Youth Province Leader", "Pastor", "Member", "Partner", "Other"]}
+        {"key": "relationship", "label": "Relationship With Youth Province", "type": "multiple_choice", "required": true, "allow_other": true, "options": ["Youth Province Leader", "Pastor", "Member", "Partner", "Other"]}
       ]
     },
     {
@@ -41,6 +40,16 @@
         {"key": "current_membership", "label": "Current Youth Province Membership", "type": "dropdown", "required": true, "options": ["Below 100", "100–500", "500–1000", "1000+"]},
         {"key": "growth_percentage", "label": "Growth Percentage in Last 12 Months", "type": "dropdown", "required": true, "options": ["0–10%", "10–30%", "30–50%", "Above 50%"]},
         {"key": "evidence_upload", "label": "Evidence Upload (attendance records, reports, photos, testimonials)", "type": "file_upload", "required": false, "accept": ["image/*", "application/pdf"]}
+      ]
+    },
+    {
+      "title": "Rate the Youth Province (1 = poor, 10 = outstanding)",
+      "fields": [
+        {"key": "growth_rating", "label": "Membership and attendance growth", "type": "linear_scale_1_10", "required": true},
+        {"key": "programs_rating", "label": "New departments, initiatives and programmes", "type": "linear_scale_1_10", "required": true},
+        {"key": "participation_rating", "label": "Youth participation and retention", "type": "linear_scale_1_10", "required": true},
+        {"key": "leadership_pipeline_rating", "label": "Leadership development pipeline", "type": "linear_scale_1_10", "required": true},
+        {"key": "sustainability_rating", "label": "Structures for continued growth", "type": "linear_scale_1_10", "required": true}
       ]
     }
   ]

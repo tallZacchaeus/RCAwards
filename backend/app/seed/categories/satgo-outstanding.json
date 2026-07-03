@@ -40,6 +40,16 @@
         {"key": "why_award", "label": "Why should this Youth Province receive the SATGO Outstanding Youth Province Award?", "type": "paragraph", "required": true, "max_words": 100},
         {"key": "supporting_upload", "label": "Supporting Document Upload (program reports, pictures, videos, financial empowerment evidence, training records, testimonies, media links)", "type": "file_upload", "required": false, "accept": ["image/*", "video/*", "application/pdf"]}
       ]
+    },
+    {
+      "title": "Rate the Youth Province (1 = poor, 10 = outstanding)",
+      "fields": [
+        {"key": "vision_rating", "label": "Vision, strategy and leadership", "type": "linear_scale_1_10", "required": true},
+        {"key": "empowerment_rating", "label": "Teachings, programmes and member empowerment", "type": "linear_scale_1_10", "required": true},
+        {"key": "financial_rating", "label": "Financial development initiatives", "type": "linear_scale_1_10", "required": true},
+        {"key": "skills_rating", "label": "Skills and training programmes", "type": "linear_scale_1_10", "required": true},
+        {"key": "development_rating", "label": "Overall province development strategy", "type": "linear_scale_1_10", "required": true}
+      ]
     }
   ]
 }

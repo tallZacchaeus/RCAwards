@@ -12,8 +12,7 @@
       "fields": [
         {"key": "nominator_full_name", "label": "Full Name", "type": "short_text", "required": true},
         {"key": "nominator_contact", "label": "Phone Number / Email Address", "type": "short_text", "required": true},
-        {"key": "relationship", "label": "Relationship With Youth Province", "type": "multiple_choice", "required": true, "allow_other": true,
-          "options": ["Youth Province Leader", "Pastor", "Member", "Partner", "Other"]}
+        {"key": "relationship", "label": "Relationship With Youth Province", "type": "multiple_choice", "required": true, "allow_other": true, "options": ["Youth Province Leader", "Pastor", "Member", "Partner", "Other"]}
       ]
     },
     {
@@ -41,6 +40,15 @@
         {"key": "souls_reached", "label": "Estimated Souls Reached", "type": "dropdown", "required": true, "options": ["Below 100", "100–500", "500–1000", "1000+"]},
         {"key": "followup_converts", "label": "Number of Follow-Up Converts", "type": "dropdown", "required": true, "options": ["Below 50", "50–200", "200+"]},
         {"key": "evidence_upload", "label": "Evidence Upload (evangelism reports, testimonies, photos, videos, outreach records)", "type": "file_upload", "required": false, "accept": ["image/*", "video/*", "application/pdf"]}
+      ]
+    },
+    {
+      "title": "Rate the Youth Province (1 = poor, 10 = outstanding)",
+      "fields": [
+        {"key": "reach_rating", "label": "Evangelism reach and souls won", "type": "linear_scale_1_10", "required": true},
+        {"key": "followup_rating", "label": "Follow-up and discipleship of converts", "type": "linear_scale_1_10", "required": true},
+        {"key": "community_impact_rating", "label": "Impact on the surrounding community", "type": "linear_scale_1_10", "required": true},
+        {"key": "consistency_rating", "label": "Consistency and growth of evangelism activities", "type": "linear_scale_1_10", "required": true}
       ]
     }
   ]

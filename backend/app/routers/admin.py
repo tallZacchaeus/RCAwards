@@ -136,10 +136,18 @@ def submit_score(
     session: Session = Depends(get_session),
     user: User = Depends(require_staff),
 ) -> ScoreOut:
-    _get_nomination(session, nomination_id)
+    nomination = _get_nomination(session, nomination_id)
     if not payload.criteria:
         raise HTTPException(status_code=422, detail="At least one criterion score is required")
+
+    # Scores may only target the category's official judging criteria.
+    category = session.get(Category, nomination.category_id)
+    valid_keys = {c.key for c in judging_criteria(category.form_schema)} if category else set()
     for key, value in payload.criteria.items():
+        if key not in valid_keys:
+            raise HTTPException(
+                status_code=422, detail=f"'{key}' is not a judging criterion of this category"
+            )
         if not 1 <= value <= 10:
             raise HTTPException(status_code=422, detail=f"Score for '{key}' must be 1-10")
 

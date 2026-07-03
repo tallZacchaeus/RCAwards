@@ -127,8 +127,24 @@ def test_full_judging_flow(client, admin_headers, judge_headers):
     entry = next(e for e in board if e["nomination_id"] == nom_id)
     assert entry["judge_count"] == 1
     assert entry["ranked_score"] > 0 and entry["panel_size"] >= 1
+    # Sheet convention: per-criterion average = (sum of scores) ÷ full panel size,
+    # and the Ranked Score is the sum of those averages.
+    panel = entry["panel_size"]
     by_key = {c["key"]: c["average"] for c in entry["criteria"]}
-    assert by_key["staff_child_ratio"] == 8.0 and by_key["cleanliness_safety"] == 9.0
+    assert by_key["staff_child_ratio"] == round(8 / panel, 2)
+    assert by_key["cleanliness_safety"] == round(9 / panel, 2)
+    assert entry["ranked_score"] == round(17 / panel, 2)
+
+
+def test_score_rejects_unknown_criterion(client, judge_headers):
+    nom_id = client.post("/nominations", json=valid_creche_payload()).json()["id"]
+    resp = client.post(
+        f"/admin/nominations/{nom_id}/scores",
+        json={"criteria": {"not_a_real_criterion": 8}},
+        headers=judge_headers,
+    )
+    assert resp.status_code == 422
+    assert "not a judging criterion" in resp.json()["detail"]
 
 
 def test_category_criteria_endpoint(client, admin_headers):

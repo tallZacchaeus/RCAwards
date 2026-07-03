@@ -4,13 +4,14 @@ A category's official judging criteria ARE the 1-10 evaluation fields on its
 nomination form, so there's a single source of truth. Scoring aggregates the way
 the committee's spreadsheet does:
 
-  per-criterion average  = mean of the scores judges actually gave
-  nominee Ranked Score   = (sum of every criterion score from every judge)
-                           ÷ panel size
+  per-criterion average  = (sum of scores given for that criterion) ÷ panel size
+  nominee Ranked Score   = sum of the per-criterion averages
+                         = (sum of every score from every judge) ÷ panel size
 
 Dividing by the full panel size (not just participating judges) is deliberate —
 a nominee seen by more judges earns more validated weight, exactly as the sheet
-does.
+does. Judges who did not score simply contribute nothing (the sheet records
+them as zeros; same result).
 """
 from __future__ import annotations
 
@@ -37,7 +38,7 @@ def judging_criteria(form_schema: dict) -> list[Criterion]:
 
 @dataclass
 class NomineeResult:
-    criteria_averages: dict[str, float]  # criterion key → mean of given scores
+    criteria_averages: dict[str, float]  # criterion key → (sum of scores) ÷ panel size
     ranked_score: float
     judge_count: int  # distinct judges who scored this nominee
 
@@ -53,10 +54,10 @@ def score_nominee(
             by_criterion.setdefault(key, []).append(value)
             total_sum += value
 
-    averages = {
-        key: round(sum(vals) / len(vals), 2) for key, vals in by_criterion.items() if vals
-    }
     divisor = panel_size if panel_size > 0 else max(1, len(judge_criteria_maps))
+    averages = {
+        key: round(sum(vals) / divisor, 2) for key, vals in by_criterion.items() if vals
+    }
     ranked = round(total_sum / divisor, 2)
     return NomineeResult(
         criteria_averages=averages,

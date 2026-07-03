@@ -20,28 +20,28 @@
       "title": "Spiritual Development of Youths",
       "fields": [
         {"key": "spiritual_text", "label": "In less than 200 words, describe how this region has contributed to the spiritual growth of its youth (e.g. Bible Study, discipleship, prayer revival).", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "spiritual_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "spiritual_rating", "label": "Spiritual Development of Youths", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Skill & Capacity Building Programs",
       "fields": [
         {"key": "skills_text", "label": "In less than 200 words, list or explain youth empowerment programs (e.g. tech training, entrepreneurship, career coaching, educational support).", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "skills_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "skills_rating", "label": "Skill & Capacity Building Programs", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Youth Engagement & Inclusion in Church Activities",
       "fields": [
         {"key": "engagement_text", "label": "In less than 200 words, explain how youths are involved in leadership, events, missions, and church projects within the region.", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "engagement_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "engagement_rating", "label": "Youth Engagement & Inclusion in Church Activities", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Impact Measurement & Track Record",
       "fields": [
         {"key": "impact_text", "label": "In less than 200 words, provide verifiable results or testimonials of how the region's youth ministry has influenced lives, churches, or communities.", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "impact_rating", "label": "Impact Measurement & Track Record", "type": "linear_scale_1_10", "required": true}
       ]
     }
   ]

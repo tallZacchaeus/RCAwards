@@ -20,28 +20,28 @@
       "title": "Organization of Sports Events",
       "fields": [
         {"key": "events_text", "label": "In less than 200 words, describe the types, frequency, and scale of sports programs organized by the region (e.g. youth tournaments, fitness weekends, sport outreaches).", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "events_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "events_rating", "label": "Organization of Sports Events", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Impact on Youth Engagement",
       "fields": [
         {"key": "impact_text", "label": "In less than 200 words, explain how the sports initiatives have impacted the lives of young people spiritually, mentally, or socially.", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "impact_rating", "label": "Impact on Youth Engagement", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Leadership & Team Development",
       "fields": [
         {"key": "leadership_text", "label": "In less than 200 words, describe how the region uses sports to develop leadership, teamwork, discipline, and mentorship among youths.", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "leadership_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "leadership_rating", "label": "Leadership & Team Development", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Inclusiveness & Talent Discovery",
       "fields": [
         {"key": "inclusiveness_text", "label": "In less than 200 words, describe how the region includes diverse youth groups in sports and any success stories in talent discovery or development.", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "inclusiveness_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "inclusiveness_rating", "label": "Inclusiveness & Talent Discovery", "type": "linear_scale_1_10", "required": true}
       ]
     }
   ]

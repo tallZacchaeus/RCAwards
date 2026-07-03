@@ -20,34 +20,35 @@
       "title": "Purpose and Objectives",
       "fields": [
         {"key": "purpose_text", "label": "What was the main goal of the event? Was it achieved? Provide a brief overview of the event's purpose.", "type": "paragraph", "required": true},
-        {"key": "purpose_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "purpose_rating", "label": "Purpose and Objectives", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Audience Engagement and Participation",
       "fields": [
         {"key": "engagement_text", "label": "Describe how the event engaged its audience. Was it interactive, inclusive, and well-attended?", "type": "paragraph", "required": true},
-        {"key": "engagement_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "engagement_rating", "label": "Audience Engagement and Participation", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Creativity and Innovation",
       "fields": [
-        {"key": "creativity_text", "label": "What made the event unique? Were there any creative themes, concepts, or formats used?", "type": "paragraph", "required": true}
+        {"key": "creativity_text", "label": "What made the event unique? Were there any creative themes, concepts, or formats used?", "type": "paragraph", "required": true},
+        {"key": "creativity_rating", "label": "Creativity and Innovation", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Execution and Planning Excellence",
       "fields": [
         {"key": "execution_text", "label": "Evaluate the organisation, logistics, and overall delivery of the event. Was it smooth and professionally managed?", "type": "paragraph", "required": false},
-        {"key": "execution_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "execution_rating", "label": "Execution and Planning Excellence", "type": "linear_scale_1_10", "required": true}
       ]
     },
     {
       "title": "Impact and Outcomes",
       "fields": [
         {"key": "impact_text", "label": "Share any measurable or noticeable outcome of the event (e.g. funds raised, people impacted, awareness created, lasting effects).", "type": "paragraph", "required": true, "max_words": 200},
-        {"key": "impact_rating", "label": "Rate on a scale of 1-10", "type": "linear_scale_1_10", "required": true}
+        {"key": "impact_rating", "label": "Impact and Outcomes", "type": "linear_scale_1_10", "required": true}
       ]
     }
   ]
