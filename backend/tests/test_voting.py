@@ -83,7 +83,7 @@ def test_voting_closed_window(client, admin_headers):
         "/votes", json={"nominee_id": nominee_id, "voter_fingerprint": "device-ddd-4444"}
     )
     assert resp.status_code == 409
-    assert "closed" in resp.json()["detail"].lower()
+    assert resp.json()["detail"]["code"] == "voting_closed"
     _clear_voting_window()
 
 
@@ -92,3 +92,39 @@ def test_voting_status_endpoint(client):
     status = client.get("/voting/status").json()
     assert status["open"] is True
     assert status["results_public"] is True
+
+
+def test_duplicate_vote_returns_machine_readable_code(client, admin_headers):
+    _clear_voting_window()
+    nominee_id = _make_nominee(client, admin_headers, "Coded Conflict")
+    fp = "device-code-9999"
+    assert client.post("/votes", json={"nominee_id": nominee_id, "voter_fingerprint": fp}).status_code == 200
+    dupe = client.post("/votes", json={"nominee_id": nominee_id, "voter_fingerprint": fp})
+    assert dupe.status_code == 409
+    assert dupe.json()["detail"]["code"] == "already_voted"
+
+
+def test_cast_vote_hides_count_when_results_private(client, admin_headers):
+    _clear_voting_window()
+    nominee_id = _make_nominee(client, admin_headers, "Secret Standings")
+    _set_setting("voting_results_public", "false")
+    try:
+        resp = client.post(
+            "/votes", json={"nominee_id": nominee_id, "voter_fingerprint": "device-priv-1"}
+        )
+        assert resp.status_code == 200
+        # Voted, but the live count must not leak while results are private.
+        assert resp.json()["voted"] is True
+        assert resp.json()["vote_count"] == 0
+    finally:
+        _set_setting("voting_results_public", "true")
+
+
+def test_delete_nominee_removes_it_and_votes(client, admin_headers):
+    _clear_voting_window()
+    nominee_id = _make_nominee(client, admin_headers, "To Be Deleted")
+    client.post("/votes", json={"nominee_id": nominee_id, "voter_fingerprint": "device-del-1"})
+    resp = client.delete(f"/admin/nominees/{nominee_id}", headers=admin_headers)
+    assert resp.status_code == 204
+    nominees = client.get("/nominees?category=creche-of-the-year").json()
+    assert all(n["id"] != nominee_id for n in nominees)

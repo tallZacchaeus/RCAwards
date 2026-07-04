@@ -9,6 +9,19 @@
 {$SITE_DOMAIN} {
 	encode gzip zstd
 
+	# Cap every request body at 12 MB. The upload endpoint allows 10 MB files;
+	# this stops an attacker streaming an oversized body to exhaust backend memory
+	# before the application-level size check runs.
+	request_body {
+		max_size 12MB
+	}
+
+	# Security headers (defence-in-depth; the app also sets these).
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
 	# API — handle_path strips /api before proxying, so /api/categories
 	# reaches the backend as /categories.
 	handle_path /api/* {

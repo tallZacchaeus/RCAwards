@@ -42,10 +42,15 @@ export function FieldRenderer({
   const invalid = Boolean(error);
   const showOther =
     field.allow_other && typeof value === "string" && isOtherOption(value);
+  const labelId = `${field.key}-label`;
+  const errorId = `${field.key}-error`;
+  const describedBy = error ? errorId : undefined;
 
   return (
-    <div className="flex flex-col gap-2.5">
-      <Label htmlFor={field.key}>
+    // id on the wrapper gives every field type (incl. radio/scale/upload) a stable
+    // scroll/focus target for validation, and a group naming anchor for AT.
+    <div id={`field-${field.key}`} className="flex flex-col gap-2.5">
+      <Label htmlFor={field.key} id={labelId}>
         <span>{field.label}</span>
         {field.required && <span className="text-gold">*</span>}
       </Label>
@@ -59,13 +64,22 @@ export function FieldRenderer({
             placeholder="Please specify…"
             value={(otherValue as string) ?? ""}
             aria-invalid={Boolean(otherError)}
+            aria-describedby={otherError ? `${field.key}__other-error` : undefined}
             onChange={(e) => onOtherChange(e.target.value)}
           />
-          {otherError && <p className="mt-1 text-xs text-red-400">{otherError}</p>}
+          {otherError && (
+            <p id={`${field.key}__other-error`} role="alert" className="mt-1 text-xs text-red-400">
+              {otherError}
+            </p>
+          )}
         </div>
       )}
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && (
+        <p id={errorId} role="alert" className="text-xs text-red-400">
+          {error}
+        </p>
+      )}
     </div>
   );
 
@@ -75,8 +89,10 @@ export function FieldRenderer({
         return (
           <Textarea
             id={field.key}
+            name={field.key}
             value={(value as string) ?? ""}
             aria-invalid={invalid}
+            aria-describedby={describedBy}
             placeholder={field.max_words ? `Max ${field.max_words} words` : undefined}
             onChange={(e) => onChange(e.target.value)}
           />
@@ -85,6 +101,8 @@ export function FieldRenderer({
       case "yes_no":
         return (
           <RadioGroup
+            aria-labelledby={labelId}
+            aria-describedby={describedBy}
             value={(value as string) ?? ""}
             onValueChange={(v) => onChange(v)}
           >
@@ -99,6 +117,8 @@ export function FieldRenderer({
       case "multiple_choice":
         return (
           <RadioGroup
+            aria-labelledby={labelId}
+            aria-describedby={describedBy}
             value={(value as string) ?? ""}
             onValueChange={(v) => onChange(v)}
           >
@@ -113,7 +133,7 @@ export function FieldRenderer({
       case "dropdown":
         return (
           <Select value={(value as string) ?? ""} onValueChange={(v) => onChange(v)}>
-            <SelectTrigger id={field.key} aria-invalid={invalid}>
+            <SelectTrigger id={field.key} aria-invalid={invalid} aria-describedby={describedBy}>
               <SelectValue placeholder="Select one…" />
             </SelectTrigger>
             <SelectContent>
@@ -128,11 +148,13 @@ export function FieldRenderer({
 
       case "linear_scale_1_10":
         return (
-          <LinearScale
-            value={value as number | undefined}
-            invalid={invalid}
-            onChange={(n) => onChange(n)}
-          />
+          <div role="group" aria-labelledby={labelId} aria-describedby={describedBy}>
+            <LinearScale
+              value={value as number | undefined}
+              invalid={invalid}
+              onChange={(n) => onChange(n)}
+            />
+          </div>
         );
 
       case "file_upload":
@@ -142,9 +164,12 @@ export function FieldRenderer({
         return (
           <Input
             id={field.key}
+            name={field.key}
             type="email"
+            autoComplete="email"
             value={(value as string) ?? ""}
             aria-invalid={invalid}
+            aria-describedby={describedBy}
             placeholder="you@example.com"
             onChange={(e) => onChange(e.target.value)}
           />
@@ -154,9 +179,12 @@ export function FieldRenderer({
         return (
           <Input
             id={field.key}
+            name={field.key}
             type="tel"
+            autoComplete="tel"
             value={(value as string) ?? ""}
             aria-invalid={invalid}
+            aria-describedby={describedBy}
             onChange={(e) => onChange(e.target.value)}
           />
         );
@@ -166,8 +194,10 @@ export function FieldRenderer({
         return (
           <Input
             id={field.key}
+            name={field.key}
             value={(value as string) ?? ""}
             aria-invalid={invalid}
+            aria-describedby={describedBy}
             onChange={(e) => onChange(e.target.value)}
           />
         );

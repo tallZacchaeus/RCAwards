@@ -12,9 +12,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY alembic.ini .
 COPY alembic ./alembic
 COPY app ./app
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
 RUN useradd -m appuser && mkdir -p /data/uploads && chown -R appuser /data /app
 USER appuser
 
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# entrypoint.sh runs `alembic upgrade head`, then launches uvicorn with
+# --proxy-headers + --forwarded-allow-ips so Starlette populates request.client
+# from X-Forwarded-For behind Caddy (otherwise the per-IP rate limiter and vote
+# anti-fraud IP hash collapse into one shared bucket for all traffic).
+CMD ["./entrypoint.sh"]

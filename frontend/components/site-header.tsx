@@ -78,6 +78,7 @@ export function SiteHeader() {
           <button
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
+            aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
             className="flex h-9 w-9 flex-col items-center justify-center gap-1.5 text-ink md:hidden"
           >
@@ -90,9 +91,13 @@ export function SiteHeader() {
 
       {/* Mobile nav */}
       <div
-        className={cn("mobile-nav glass md:hidden", !open && "[data-closed]")}
+        id="mobile-nav"
+        className="mobile-nav glass md:hidden"
         data-closed={open ? undefined : ""}
         aria-hidden={!open}
+        // inert removes the collapsed drawer's links from tab order and the a11y
+        // tree, so keyboard focus can't disappear into the hidden menu.
+        inert={!open}
       >
         <nav className="flex flex-col gap-1 px-5 py-4">
           {NAV.map((item) => (

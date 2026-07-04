@@ -15,6 +15,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { Button } from "@/components/ui/button";
 
 const STATUSES = ["", "submitted", "shortlisted", "rejected"];
+const PAGE_SIZE = 100;
 
 export default function NominationsPage() {
   const { session } = useAuth();
@@ -24,22 +25,55 @@ export default function NominationsPage() {
   const [status, setStatus] = useState("");
   const [rows, setRows] = useState<NominationListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<string>();
 
   useEffect(() => {
     getCategories().then(setCategories).catch(() => {});
   }, []);
 
+  // Reload the first page whenever the filters change. Ignore a stale response
+  // if the filters changed again before it resolved.
   useEffect(() => {
+    let active = true;
     setLoading(true);
-    listNominations({ category: category || undefined, status: status || undefined })
+    listNominations({
+      category: category || undefined,
+      status: status || undefined,
+      limit: PAGE_SIZE,
+      offset: 0,
+    })
       .then((r) => {
+        if (!active) return;
         setRows(r);
+        setHasMore(r.length === PAGE_SIZE);
         setError(undefined);
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .catch((e) => active && setError(e.message))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
   }, [category, status]);
+
+  async function loadMore() {
+    setLoadingMore(true);
+    try {
+      const more = await listNominations({
+        category: category || undefined,
+        status: status || undefined,
+        limit: PAGE_SIZE,
+        offset: rows.length,
+      });
+      setRows((prev) => [...prev, ...more]);
+      setHasMore(more.length === PAGE_SIZE);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   const catName = useMemo(() => {
     const map = new Map(categories.map((c) => [c.slug, c.name]));
@@ -52,7 +86,9 @@ export default function NominationsPage() {
         <div>
           <h1 className="font-serif text-3xl text-ink">Nominations</h1>
           <p className="text-sm text-ink-muted">
-            {loading ? "Loading…" : `${rows.length} nomination${rows.length === 1 ? "" : "s"}`}
+            {loading
+              ? "Loading…"
+              : `${rows.length}${hasMore ? "+" : ""} nomination${rows.length === 1 ? "" : "s"}`}
           </p>
         </div>
         {session?.role === "admin" && (
@@ -94,8 +130,8 @@ export default function NominationsPage() {
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
-      <div className="overflow-hidden rounded-2xl border border-line">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-line">
+        <table className="w-full min-w-[32rem] text-left text-sm">
           <thead className="bg-bg-raised/60 text-xs uppercase tracking-wider text-ink-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Category</th>
@@ -134,6 +170,14 @@ export default function NominationsPage() {
           </tbody>
         </table>
       </div>
+
+      {hasMore && (
+        <div className="flex justify-center">
+          <Button variant="outline" size="sm" onClick={loadMore} disabled={loadingMore}>
+            {loadingMore ? "Loading…" : "Load more"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

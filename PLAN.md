@@ -142,7 +142,7 @@ Each is seeded as a JSON form definition extracted from `2026 Content For Award 
 ## 8. Open items to confirm as we go
 
 - **Voting model:** one vote per category per device, or weighted/limited? Public tallies visible live or revealed at close?
-- **Nomination vs voting windows:** exact open/close dates around the 31 July event.
+- **Nomination vs voting windows:** exact open/close dates around the 29 July event.
 - **Auth for judges:** invite-only accounts vs SSO.
 - **Storage/hosting** provider choices (finalize at Phase 7).
 - **Captcha** provider (hCaptcha/Turnstile) for nominations + votes.

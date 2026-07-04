@@ -54,21 +54,26 @@ export function NominationForm({ category }: { category: CategoryDetail }) {
     }
 
     setSubmitting(true);
-    const fileRefs: FileRef[] = Object.entries(files).map(([field_key, f]) => ({
-      field_key,
-      url: f.url,
-    }));
-    const result = await submitNomination(form.slug, answers, fileRefs, hp);
-    setSubmitting(false);
+    try {
+      const fileRefs: FileRef[] = Object.entries(files).map(([field_key, f]) => ({
+        field_key,
+        url: f.url,
+      }));
+      const result = await submitNomination(form.slug, answers, fileRefs, hp);
 
-    if (result.ok) {
-      setDoneId(result.id);
-      fireConfetti();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      setErrors(result.fieldErrors);
-      setFormError(result.message);
-      if (Object.keys(result.fieldErrors).length) focusFirstError(result.fieldErrors);
+      if (result.ok) {
+        setDoneId(result.id);
+        fireConfetti();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setErrors(result.fieldErrors);
+        setFormError(result.message);
+        if (Object.keys(result.fieldErrors).length) focusFirstError(result.fieldErrors);
+      }
+    } finally {
+      // Always re-enable the button, even on an unexpected throw, so a completed
+      // form is never stranded behind a permanently-disabled "Submitting…".
+      setSubmitting(false);
     }
   }
 
@@ -133,7 +138,10 @@ export function NominationForm({ category }: { category: CategoryDetail }) {
       ))}
 
       {formError && (
-        <p className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <p
+          role="alert"
+          className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+        >
           {formError}
         </p>
       )}
@@ -153,7 +161,11 @@ export function NominationForm({ category }: { category: CategoryDetail }) {
 function focusFirstError(errors: FieldErrors) {
   const firstKey = Object.keys(errors)[0];
   if (!firstKey) return;
-  const el = document.getElementById(firstKey.replace(/__other$/, ""));
+  const key = firstKey.replace(/__other$/, "");
+  // Every field type has a wrapper `#field-<key>`; the control itself only has
+  // `#<key>` for text-like inputs. Prefer the control (so focus lands on it),
+  // fall back to the wrapper so radio/scale/upload fields still scroll into view.
+  const el = document.getElementById(key) ?? document.getElementById(`field-${key}`);
   if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "center" });
     (el as HTMLElement).focus?.();

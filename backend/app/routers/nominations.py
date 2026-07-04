@@ -1,12 +1,16 @@
 """Public nomination submission and file uploads."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+import re
+
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..antispam import check_honeypot
+from ..config import get_settings
 from ..db import get_session
+from ..mailer import notify_nomination_received
 from ..models import Category, Nomination, NominationFile
 from ..ratelimit import rate_limit
 from ..schemas.api import NominationCreate, NominationCreated, UploadResult
@@ -18,6 +22,20 @@ from ._helpers import summarize_submission
 router = APIRouter(tags=["nominations"])
 
 
+def _validate_file_ref_url(url: str) -> None:
+    """Only accept URLs that point at our own upload store. A nomination's file
+    URL is client-supplied and later rendered as a clickable link in the admin
+    dashboard — an arbitrary external/`javascript:` URL would be a phishing/XSS
+    vector, so reject anything that isn't `<upload_base_url>/<uuid>.<ext>`."""
+    base = get_settings().upload_base_url.rstrip("/")
+    pattern = rf"^{re.escape(base)}/[0-9a-f]{{32}}\.[a-z0-9]+$"
+    if not re.match(pattern, url):
+        raise HTTPException(
+            status_code=422,
+            detail={"field_errors": {"files": "Invalid file reference."}},
+        )
+
+
 @router.post(
     "/nominations",
     response_model=NominationCreated,
@@ -25,7 +43,9 @@ router = APIRouter(tags=["nominations"])
     dependencies=[Depends(rate_limit)],
 )
 def create_nomination(
-    payload: NominationCreate, session: Session = Depends(get_session)
+    payload: NominationCreate,
+    background_tasks: BackgroundTasks,
+    session: Session = Depends(get_session),
 ) -> NominationCreated:
     check_honeypot(payload.website)
     category = session.scalar(
@@ -51,12 +71,22 @@ def create_nomination(
         answers=payload.answers,
     )
     for ref in payload.files:
+        _validate_file_ref_url(ref.url)
         nomination.files.append(
             NominationFile(field_key=ref.field_key, url=ref.url, kind=ref.kind)
         )
     session.add(nomination)
     session.commit()
     session.refresh(nomination)
+
+    # Fire-and-forget confirmation to the nominator (no-op unless SMTP is
+    # configured and the contact is an email); never blocks or fails the request.
+    background_tasks.add_task(
+        notify_nomination_received,
+        summary["nominator_contact"],
+        category.name,
+        nomination.id,
+    )
 
     return NominationCreated(
         id=nomination.id,

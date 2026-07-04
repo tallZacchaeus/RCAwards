@@ -29,8 +29,8 @@ def test_admin_can_set_voting_window(client, admin_headers):
     resp = client.put(
         "/admin/settings",
         json={
-            "voting_opens_at": "2020-01-01T00:00:00",
-            "voting_closes_at": "2090-01-01T00:00:00",
+            "voting_opens_at": "2020-01-01T00:00:00Z",
+            "voting_closes_at": "2090-01-01T00:00:00Z",
             "voting_results_public": False,
         },
         headers=admin_headers,
@@ -58,3 +58,30 @@ def test_settings_rejects_bad_datetime(client, admin_headers):
         headers=admin_headers,
     )
     assert resp.status_code == 422
+
+
+def test_settings_rejects_naive_datetime(client, admin_headers):
+    # A wall-clock time with no timezone offset is ambiguous and must be refused.
+    resp = client.put(
+        "/admin/settings",
+        json={"voting_opens_at": "2026-07-29T18:00:00"},
+        headers=admin_headers,
+    )
+    assert resp.status_code == 422
+
+
+def test_settings_rejects_inverted_window(client, admin_headers):
+    resp = client.put(
+        "/admin/settings",
+        json={
+            "voting_opens_at": "2026-08-01T00:00:00Z",
+            "voting_closes_at": "2026-07-01T00:00:00Z",
+        },
+        headers=admin_headers,
+    )
+    assert resp.status_code == 422
+    client.put(
+        "/admin/settings",
+        json={"voting_opens_at": "", "voting_closes_at": ""},
+        headers=admin_headers,
+    )

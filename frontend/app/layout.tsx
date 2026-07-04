@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cinzel, Playfair_Display, Cormorant_Garamond, Manrope } from "next/font/google";
+import { Cinzel, Playfair_Display, Manrope } from "next/font/google";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -10,15 +10,7 @@ const cinzel = Cinzel({
 });
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  style: ["normal", "italic"],
   variable: "--font-playfair",
-  display: "swap",
-});
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
   display: "swap",
 });
 const manrope = Manrope({
@@ -27,7 +19,18 @@ const manrope = Manrope({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// A real landscape event photo makes a far better share card than the
+// transparent wordmark. Replace with a dedicated 1200x630 designed image later.
+const OG_IMAGE = {
+  url: "/brand/photos/gallery/g20.jpg",
+  width: 1400,
+  height: 933,
+  alt: "The Redemption City Awards of Excellence 2026",
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "The Redemption City Awards of Excellence 2026",
     template: "%s · RCA 2026",
@@ -53,6 +56,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_GB",
     siteName: "Redemption City Awards",
+    url: SITE_URL,
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
@@ -60,6 +65,7 @@ export const metadata: Metadata = {
     description:
       "Celebrating a culture of excellence across Redemption City. Powered by City Breed.",
     creator: "@thecitybreed",
+    images: [OG_IMAGE.url],
   },
   robots: {
     index: true,
@@ -78,14 +84,20 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+import { CursorTrail } from "@/components/cursor-trail";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${cinzel.variable} ${playfair.variable} ${cormorant.variable} ${manrope.variable}`}
+      className={`${cinzel.variable} ${playfair.variable} ${manrope.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <CursorTrail />
+        {children}
+      </body>
     </html>
   );
 }
+

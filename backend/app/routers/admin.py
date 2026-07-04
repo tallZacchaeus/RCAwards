@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import csv
 import io
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..db import get_session
@@ -24,6 +25,8 @@ from ..models import (
 )
 from ..judging import judging_criteria, score_nominee
 from ..schemas.api import (
+    CategoryFlags,
+    CategoryFlagsUpdate,
     CriterionAverage,
     CriterionOut,
     FileRef,
@@ -39,6 +42,7 @@ from ..schemas.api import (
     StatusUpdate,
     UserCreate,
     UserOut,
+    UserUpdate,
 )
 from ..security import hash_password, require_admin, require_staff
 from ._helpers import summarize_submission
@@ -114,7 +118,15 @@ def update_status(
     _: User = Depends(require_admin),
 ) -> NominationListItem:
     nomination = _get_nomination(session, nomination_id)
-    nomination.status = _parse_status(payload.status)
+    new_status = _parse_status(payload.status)
+    nomination.status = new_status
+    # Keep the public voting slate in sync: rejecting a nomination hides any
+    # nominee that was promoted from it, so it disappears from the vote page.
+    if new_status == NominationStatus.rejected:
+        for nominee in session.scalars(
+            select(Nominee).where(Nominee.source_nomination_id == nomination.id)
+        ).all():
+            nominee.is_shortlisted = False
     session.commit()
     session.refresh(nomination)
     return NominationListItem(
@@ -151,19 +163,57 @@ def submit_score(
         if not 1 <= value <= 10:
             raise HTTPException(status_code=422, detail=f"Score for '{key}' must be 1-10")
 
-    total = sum(payload.criteria.values())
     score = session.scalar(
         select(Score).where(Score.nomination_id == nomination_id, Score.judge_id == user.id)
     )
     if score is None:
         score = Score(nomination_id=nomination_id, judge_id=user.id)
         session.add(score)
-    score.criteria = payload.criteria
+    # Merge into any existing criteria rather than replacing the whole map, so a
+    # judge who resubmits a subset of criteria doesn't silently wipe the rest.
+    merged = {**(score.criteria or {}), **payload.criteria}
+    total = sum(merged.values())
+    score.criteria = merged
     score.total = total
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        # Concurrent first-time submit by the same judge lost the race on
+        # uq_score_once — reload the winner's row and merge into it.
+        session.rollback()
+        score = session.scalar(
+            select(Score).where(Score.nomination_id == nomination_id, Score.judge_id == user.id)
+        )
+        merged = {**(score.criteria or {}), **payload.criteria}
+        total = sum(merged.values())
+        score.criteria = merged
+        score.total = total
+        session.commit()
 
     return ScoreOut(
-        nomination_id=nomination_id, judge_id=user.id, criteria=payload.criteria, total=total
+        nomination_id=nomination_id, judge_id=user.id, criteria=merged, total=total
+    )
+
+
+@router.get("/nominations/{nomination_id}/scores/me", response_model=ScoreOut | None)
+def my_score(
+    nomination_id: int,
+    session: Session = Depends(get_session),
+    user: User = Depends(require_staff),
+) -> ScoreOut | None:
+    """The current judge's own saved score for a nomination, so the scoring UI can
+    prefill instead of starting blank (which risks overwriting prior scores)."""
+    _get_nomination(session, nomination_id)
+    score = session.scalar(
+        select(Score).where(Score.nomination_id == nomination_id, Score.judge_id == user.id)
+    )
+    if score is None:
+        return None
+    return ScoreOut(
+        nomination_id=nomination_id,
+        judge_id=user.id,
+        criteria=score.criteria or {},
+        total=score.total or 0,
     )
 
 
@@ -176,6 +226,19 @@ def _panel_size(session: Session) -> int:
         )
         or 0
     )
+
+
+def _scores_by_nomination(session: Session, nomination_ids: list[int]) -> dict[int, list[Score]]:
+    """All scores for the given nominations in ONE query, grouped in Python —
+    avoids a per-nomination SELECT (the leaderboard is refreshed constantly)."""
+    grouped: dict[int, list[Score]] = {nid: [] for nid in nomination_ids}
+    if not nomination_ids:
+        return grouped
+    for score in session.scalars(
+        select(Score).where(Score.nomination_id.in_(nomination_ids))
+    ).all():
+        grouped.setdefault(score.nomination_id, []).append(score)
+    return grouped
 
 
 def _category_or_404(session: Session, slug: str) -> Category:
@@ -211,9 +274,10 @@ def leaderboard(
     nominations = list(
         session.scalars(select(Nomination).where(Nomination.category_id == category.id)).all()
     )
+    scores_by_nom = _scores_by_nomination(session, [n.id for n in nominations])
     entries: list[LeaderboardEntry] = []
     for nom in nominations:
-        scores = session.scalars(select(Score).where(Score.nomination_id == nom.id)).all()
+        scores = scores_by_nom.get(nom.id, [])
         result = score_nominee([s.criteria for s in scores], panel)
         entries.append(
             LeaderboardEntry(
@@ -265,20 +329,21 @@ def judging_sheet_csv(
     nominations = list(
         session.scalars(select(Nomination).where(Nomination.category_id == category.id)).all()
     )
+    scores_by_nom = _scores_by_nomination(session, [n.id for n in nominations])
 
     buffer = io.StringIO()
     writer = csv.writer(buffer)
-    writer.writerow(["NOMINEE", "CRITERIA", *[judge_label[j.id] for j in judges], "Average", "Ranked Score"])
+    _safe_writerow(writer, ["NOMINEE", "CRITERIA", *[judge_label[j.id] for j in judges], "Average", "Ranked Score"])
 
     for nom in nominations:
-        scores = session.scalars(select(Score).where(Score.nomination_id == nom.id)).all()
+        scores = scores_by_nom.get(nom.id, [])
         by_judge = {s.judge_id: s.criteria for s in scores}
         result = score_nominee([s.criteria for s in scores], panel)
         nominee = summarize_submission(nom.answers)["nominee_name"] or f"Nomination #{nom.id}"
-        writer.writerow([nominee, "", *["" for _ in judges], "", result.ranked_score])
+        _safe_writerow(writer, [nominee, "", *["" for _ in judges], "", result.ranked_score])
         for c in criteria:
             row_scores = [by_judge.get(j.id, {}).get(c.key, "") for j in judges]
-            writer.writerow(["", c.label, *row_scores, result.criteria_averages.get(c.key, ""), ""])
+            _safe_writerow(writer, ["", c.label, *row_scores, result.criteria_averages.get(c.key, ""), ""])
 
     buffer.seek(0)
     return StreamingResponse(
@@ -304,13 +369,14 @@ def export_csv(
 
     buffer = io.StringIO()
     writer = csv.writer(buffer)
-    writer.writerow(
+    _safe_writerow(
+        writer,
         ["id", "category", "status", "nominator_name", "nominator_contact",
-         "residency", "nominee", "created_at", "answers_json"]
+         "residency", "nominee", "created_at", "answers_json"],
     )
     for nom, slug in rows:
         summary = summarize_submission(nom.answers)
-        writer.writerow([
+        _safe_writerow(writer, [
             nom.id, slug, nom.status.value, nom.nominator_name, nom.nominator_contact,
             nom.residency, summary["nominee_name"], nom.created_at.isoformat(),
             _json_compact(nom.answers),
@@ -351,7 +417,32 @@ def list_nominees(
     if category:
         stmt = stmt.where(Category.slug == category)
     stmt = stmt.order_by(Nominee.display_name)
-    return [_nominee_out(session, n, slug) for n, slug in session.execute(stmt).all()]
+    rows = session.execute(stmt).all()
+
+    # One grouped vote-count query for all nominees instead of one per row.
+    nominee_ids = [n.id for n, _ in rows]
+    counts: dict[int, int] = {}
+    if nominee_ids:
+        counts = {
+            nid: cnt
+            for nid, cnt in session.execute(
+                select(Vote.nominee_id, func.count(Vote.id))
+                .where(Vote.nominee_id.in_(nominee_ids))
+                .group_by(Vote.nominee_id)
+            ).all()
+        }
+    return [
+        NomineeOut(
+            id=n.id,
+            category_slug=slug,
+            display_name=n.display_name,
+            summary=n.summary,
+            photo_url=n.photo_url,
+            vote_count=int(counts.get(n.id, 0)),
+            is_winner=n.is_winner,
+        )
+        for n, slug in rows
+    ]
 
 
 @router.post("/nominees", response_model=NomineeOut, status_code=status.HTTP_201_CREATED)
@@ -384,21 +475,49 @@ def shortlist_nomination(
     session: Session = Depends(get_session),
     _: User = Depends(require_admin),
 ) -> NomineeOut:
-    """Promote a nomination to a shortlisted nominee (eligible for voting)."""
+    """Promote a nomination to a shortlisted nominee (eligible for voting).
+
+    Idempotent: calling it again (e.g. a double-click) re-uses the existing
+    nominee instead of creating a duplicate that would split the vote.
+    """
     nomination = _get_nomination(session, nomination_id)
     nomination.status = NominationStatus.shortlisted
     display_name = summarize_submission(nomination.answers)["nominee_name"] or f"Nominee #{nomination.id}"
-    nominee = Nominee(
-        category_id=nomination.category_id,
-        source_nomination_id=nomination.id,
-        display_name=display_name,
-        edition_year=nomination.category.edition_year,
-        is_shortlisted=True,
+
+    nominee = session.scalar(
+        select(Nominee).where(Nominee.source_nomination_id == nomination.id)
     )
-    session.add(nominee)
+    if nominee is None:
+        nominee = Nominee(
+            category_id=nomination.category_id,
+            source_nomination_id=nomination.id,
+            display_name=display_name,
+            edition_year=nomination.category.edition_year,
+            is_shortlisted=True,
+        )
+        session.add(nominee)
+    else:
+        # Re-shortlist a previously hidden nominee (e.g. after an un-reject).
+        nominee.is_shortlisted = True
     session.commit()
     session.refresh(nominee)
     return _nominee_out(session, nominee, nomination.category.slug)
+
+
+@router.delete("/nominees/{nominee_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_nominee(
+    nominee_id: int,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> None:
+    """Remove a nominee from the voting slate. Deletes its votes too (a mistaken
+    shortlist should leave no trace); use rejection to hide without deleting."""
+    nominee = session.get(Nominee, nominee_id)
+    if nominee is None:
+        raise HTTPException(status_code=404, detail="Nominee not found")
+    session.execute(Vote.__table__.delete().where(Vote.nominee_id == nominee_id))
+    session.delete(nominee)
+    session.commit()
 
 
 @router.patch("/nominees/{nominee_id}", response_model=NomineeOut)
@@ -423,6 +542,17 @@ def _read_setting(session: Session, key: str) -> str | None:
     return row.value if row else None
 
 
+def _parse_setting_dt(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    # Coerce any legacy naive value to UTC so it compares safely with tz-aware ones.
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
 def _write_setting(session: Session, key: str, value: str | None) -> None:
     row = session.get(Setting, key)
     if value in (None, ""):
@@ -443,13 +573,21 @@ def _current_settings(session: Session) -> SettingsOut:
     )
 
 
-def _validate_iso(value: str, field: str) -> None:
+def _validate_iso(value: str, field: str) -> datetime | None:
     if value == "":
-        return
+        return None
     try:
-        datetime.fromisoformat(value)
+        parsed = datetime.fromisoformat(value)
     except ValueError:
         raise HTTPException(status_code=422, detail=f"{field} must be an ISO-8601 datetime")
+    if parsed.tzinfo is None:
+        # A naive value is ambiguous — the app compares against UTC, so a wall-clock
+        # time entered without an offset would open/close voting in the wrong hour.
+        raise HTTPException(
+            status_code=422,
+            detail=f"{field} must include a timezone offset (e.g. 2026-07-29T18:00:00+01:00 or ...Z)",
+        )
+    return parsed
 
 
 @router.get("/settings", response_model=SettingsOut)
@@ -465,11 +603,27 @@ def update_settings(
     session: Session = Depends(get_session),
     _: User = Depends(require_admin),
 ) -> SettingsOut:
+    opens_dt = closes_dt = None
     if payload.voting_opens_at is not None:
-        _validate_iso(payload.voting_opens_at, "voting_opens_at")
+        opens_dt = _validate_iso(payload.voting_opens_at, "voting_opens_at")
+    if payload.voting_closes_at is not None:
+        closes_dt = _validate_iso(payload.voting_closes_at, "voting_closes_at")
+
+    # Compare against the effective window (incoming value, else what's stored).
+    effective_opens = opens_dt if payload.voting_opens_at is not None else _parse_setting_dt(
+        _read_setting(session, "voting_opens_at")
+    )
+    effective_closes = closes_dt if payload.voting_closes_at is not None else _parse_setting_dt(
+        _read_setting(session, "voting_closes_at")
+    )
+    if effective_opens and effective_closes and effective_opens >= effective_closes:
+        raise HTTPException(
+            status_code=422, detail="voting_opens_at must be before voting_closes_at"
+        )
+
+    if payload.voting_opens_at is not None:
         _write_setting(session, "voting_opens_at", payload.voting_opens_at)
     if payload.voting_closes_at is not None:
-        _validate_iso(payload.voting_closes_at, "voting_closes_at")
         _write_setting(session, "voting_closes_at", payload.voting_closes_at)
     if payload.voting_results_public is not None:
         _write_setting(
@@ -513,6 +667,85 @@ def list_users(
     return list(session.scalars(select(User).order_by(User.id)).all())
 
 
+@router.patch("/users/{user_id}", response_model=UserOut)
+def update_user(
+    user_id: int,
+    payload: UserUpdate,
+    session: Session = Depends(get_session),
+    actor: User = Depends(require_admin),
+) -> User:
+    """Deactivate/reactivate, change role, or reset a user's password.
+
+    Deactivating takes effect immediately (get_current_user re-checks `active` on
+    every request), giving a real kill switch for a leaked account."""
+    user = session.get(User, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if payload.active is False and user.id == actor.id:
+        raise HTTPException(status_code=422, detail="You cannot deactivate your own account")
+    if payload.role is not None:
+        try:
+            user.role = UserRole(payload.role)
+        except ValueError:
+            raise HTTPException(status_code=422, detail="role must be 'admin' or 'judge'")
+    if payload.active is not None:
+        user.active = payload.active
+    if payload.password is not None:
+        user.password_hash = hash_password(payload.password)
+        # Invalidate any JWTs issued before this password change.
+        user.token_version = (user.token_version or 0) + 1
+    session.commit()
+    session.refresh(user)
+    return user
+
+
+# --- Categories: operational toggles (admin only) -----------------------------
+
+@router.get("/categories", response_model=list[CategoryFlags])
+def list_category_flags(
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> list[CategoryFlags]:
+    cats = session.scalars(select(Category).order_by(Category.sort_order, Category.name)).all()
+    return [
+        CategoryFlags(
+            slug=c.slug,
+            name=c.name,
+            nominations_open=c.nominations_open,
+            voting_enabled=c.voting_enabled,
+            active=c.active,
+        )
+        for c in cats
+    ]
+
+
+@router.patch("/categories/{slug}", response_model=CategoryFlags)
+def update_category_flags(
+    slug: str,
+    payload: CategoryFlagsUpdate,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> CategoryFlags:
+    """Open/close nominations, enable/disable voting, or hide a category —
+    without a redeploy or direct DB access."""
+    category = _category_or_404(session, slug)
+    if payload.nominations_open is not None:
+        category.nominations_open = payload.nominations_open
+    if payload.voting_enabled is not None:
+        category.voting_enabled = payload.voting_enabled
+    if payload.active is not None:
+        category.active = payload.active
+    session.commit()
+    session.refresh(category)
+    return CategoryFlags(
+        slug=category.slug,
+        name=category.name,
+        nominations_open=category.nominations_open,
+        voting_enabled=category.voting_enabled,
+        active=category.active,
+    )
+
+
 # --- helpers ------------------------------------------------------------------
 
 def _parse_status(value: str) -> NominationStatus:
@@ -529,3 +762,19 @@ def _json_compact(data: dict) -> str:
     import json
 
     return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+
+
+_CSV_INJECTION_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _csv_safe(value):
+    """Neutralize spreadsheet formula injection: a cell that begins with =,+,-,@
+    (or tab/CR) is executed by Excel/Sheets on open. Prefix it with an apostrophe
+    so user-supplied text is treated as literal text, not a formula."""
+    if isinstance(value, str) and value and value[0] in _CSV_INJECTION_PREFIXES:
+        return "'" + value
+    return value
+
+
+def _safe_writerow(writer, row) -> None:
+    writer.writerow([_csv_safe(cell) for cell in row])

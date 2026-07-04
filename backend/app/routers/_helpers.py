@@ -27,13 +27,19 @@ def _first(answers: dict[str, Any], keys: tuple[str, ...]) -> Any | None:
 
 
 def summarize_submission(answers: dict[str, Any]) -> dict[str, Any]:
+    # Cap lengths to the denormalized columns' limits (models.py). MySQL/MariaDB in
+    # strict mode raises DataError on overflow (SQLite silently truncates), so a
+    # long pasted name/contact would 500 the submission in production without this.
     return {
-        "nominator_name": _first(answers, _NOMINATOR_NAME_KEYS),
-        "nominator_contact": _first(answers, _NOMINATOR_CONTACT_KEYS),
-        "residency": _stringify(_first(answers, _RESIDENCY_KEYS)),
-        "nominee_name": _first(answers, _NOMINEE_NAME_KEYS),
+        "nominator_name": _truncate(_first(answers, _NOMINATOR_NAME_KEYS), 200),
+        "nominator_contact": _truncate(_first(answers, _NOMINATOR_CONTACT_KEYS), 200),
+        "residency": _truncate(_first(answers, _RESIDENCY_KEYS), 120),
+        "nominee_name": _truncate(_first(answers, _NOMINEE_NAME_KEYS), 200),
     }
 
 
-def _stringify(value: Any | None) -> str | None:
-    return None if value is None else str(value)
+def _truncate(value: Any | None, limit: int) -> str | None:
+    if value is None:
+        return None
+    text = str(value)
+    return text if len(text) <= limit else text[:limit]

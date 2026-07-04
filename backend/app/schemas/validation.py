@@ -14,6 +14,12 @@ from .form_schema import FieldType, Field_, FormDefinition
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _OTHER_SUFFIX = "__other"  # answers[f"{key}__other"] holds the free-text for "Other"
 
+# Per-field character caps. A clean 422 beats silent truncation of the
+# denormalized columns (or a MySQL "Data too long" 500 in strict mode).
+_MAX_SHORT_TEXT = 500
+_MAX_PARAGRAPH = 5000
+_MAX_EMAIL = 254
+
 
 @dataclass
 class ValidationResult:
@@ -39,13 +45,16 @@ def _validate_field(f: Field_, value: Any, answers: dict[str, Any], result: Vali
         return
 
     if f.type in {FieldType.SHORT_TEXT, FieldType.PARAGRAPH}:
+        cap = _MAX_PARAGRAPH if f.type == FieldType.PARAGRAPH else _MAX_SHORT_TEXT
         if not isinstance(value, str):
             result.add(f.key, "Expected text.")
+        elif len(value) > cap:
+            result.add(f.key, f"Please keep this under {cap} characters.")
         elif f.max_words and _word_count(value) > f.max_words:
             result.add(f.key, f"Please keep this under {f.max_words} words.")
 
     elif f.type == FieldType.EMAIL:
-        if not isinstance(value, str) or not _EMAIL_RE.match(value):
+        if not isinstance(value, str) or len(value) > _MAX_EMAIL or not _EMAIL_RE.match(value):
             result.add(f.key, "Enter a valid email address.")
 
     elif f.type == FieldType.PHONE:

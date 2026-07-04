@@ -59,6 +59,7 @@ def create_access_token(user: User) -> str:
         "sub": str(user.id),
         "email": user.email,
         "role": user.role.value,
+        "ver": user.token_version,
         "iat": now,
         "exp": now + timedelta(minutes=settings.jwt_expire_minutes),
     }
@@ -84,10 +85,13 @@ def get_current_user(
     try:
         payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
         user_id = int(payload["sub"])
+        token_version = int(payload.get("ver", 0))
     except (jwt.PyJWTError, KeyError, ValueError):
         raise _credentials_error
     user = session.scalar(select(User).where(User.id == user_id))
-    if user is None or not user.active:
+    if user is None or not user.active or user.token_version != token_version:
+        # token_version mismatch → the password was changed / sessions revoked
+        # since this token was issued.
         raise _credentials_error
     return user
 

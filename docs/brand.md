@@ -1,8 +1,15 @@
 # Brand & Design Tokens — Redemption City Awards of Excellence
 
-These colors and fonts are **constant every edition** (confirmed from the official
-flyer). This file is the single source of truth for the visual system; the Phase 3
-frontend and the `Redemption City Awards.dc.html` reference both follow it.
+> **⚠️ Superseded (2026 redesign).** The palette, typography, and effects below
+> were the original brief. The shipped visual system is defined by
+> [`REDESIGN.md`](../REDESIGN.md) and `frontend/app/globals.css` — an editorial,
+> flat direction (Manrope display, no gradients/metallic fills/glow/particles).
+> Where this file and REDESIGN.md disagree, **REDESIGN.md wins.** This doc is kept
+> for historical brand context only.
+
+These colors and fonts describe the original brief (from the official flyer). The
+Phase 3 frontend and the `Redemption City Awards.dc.html` reference no longer
+follow it verbatim — see the note above.
 
 Canonical reference: the official 2026 flyer (gold metallic trophy + wordmark on
 black). Drop the artwork at `docs/brand/flyer-2026.jpg` to keep it with the repo.

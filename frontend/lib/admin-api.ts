@@ -114,11 +114,23 @@ export type NomineeOut = {
 export async function listNominations(params: {
   category?: string;
   status?: string;
+  limit?: number;
+  offset?: number;
 }): Promise<NominationListItem[]> {
   const q = new URLSearchParams();
   if (params.category) q.set("category", params.category);
   if (params.status) q.set("status", params.status);
+  q.set("limit", String(params.limit ?? 100));
+  q.set("offset", String(params.offset ?? 0));
   return json(await adminFetch(`/admin/nominations?${q.toString()}`));
+}
+
+export type MyScore = { criteria: Record<string, number>; total: number } | null;
+
+/** The current judge's own saved score for a nomination (null if none), so the
+ *  scoring UI prefills instead of starting blank and overwriting prior scores. */
+export async function getMyScore(id: number): Promise<MyScore> {
+  return json(await adminFetch(`/admin/nominations/${id}/scores/me`));
 }
 
 export async function getNomination(id: number): Promise<NominationDetail> {
@@ -173,6 +185,11 @@ export async function setWinner(id: number, isWinner: boolean): Promise<NomineeO
   return json(
     await adminFetch(`/admin/nominees/${id}?is_winner=${isWinner}`, { method: "PATCH" })
   );
+}
+
+export async function deleteNominee(id: number): Promise<void> {
+  const res = await adminFetch(`/admin/nominees/${id}`, { method: "DELETE" });
+  if (!res.ok && res.status !== 204) throw new Error(`Delete failed (${res.status})`);
 }
 
 export type AdminSettings = {

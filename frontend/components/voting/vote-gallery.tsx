@@ -35,22 +35,28 @@ export function VoteGallery({
     if (votedId || pending) return;
     setError(undefined);
     setPending(nomineeId);
-    const outcome = await castVote(nomineeId, getDeviceId());
-    setPending(null);
+    try {
+      const outcome = await castVote(nomineeId, getDeviceId());
 
-    if (outcome.ok) {
-      setNominees((prev) =>
-        prev.map((n) => (n.id === nomineeId ? { ...n, vote_count: outcome.voteCount } : n))
-      );
-      rememberVote(categorySlug, nomineeId);
-      setVotedId(nomineeId);
-      fireConfetti();
-    } else if (outcome.status === 409) {
-      rememberVote(categorySlug, nomineeId);
-      setVotedId(nomineeId);
-      setError(outcome.message);
-    } else {
-      setError(outcome.message);
+      if (outcome.ok) {
+        setNominees((prev) =>
+          prev.map((n) => (n.id === nomineeId ? { ...n, vote_count: outcome.voteCount } : n))
+        );
+        rememberVote(categorySlug, nomineeId);
+        setVotedId(nomineeId);
+        fireConfetti();
+      } else if (outcome.code === "already_voted") {
+        // Genuinely already voted on this device — record it so the UI reflects that.
+        rememberVote(categorySlug, nomineeId);
+        setVotedId(nomineeId);
+        setError(outcome.message);
+      } else {
+        // voting_closed / voting_not_enabled / vote_limit / network — show the
+        // reason but DON'T lock this device out (e.g. the window may reopen).
+        setError(outcome.message);
+      }
+    } finally {
+      setPending(null);
     }
   }
 

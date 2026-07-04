@@ -125,12 +125,18 @@ class Vote(Base):
     __tablename__ = "votes"
     __table_args__ = (
         UniqueConstraint("nominee_id", "voter_fingerprint", name="uq_vote_once"),
+        # One vote per category per device. Enforced in the schema (not just a
+        # check-then-insert) so concurrent requests cannot slip past a race.
+        UniqueConstraint("category_id", "voter_fingerprint", name="uq_vote_once_per_category"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     nominee_id: Mapped[int] = mapped_column(ForeignKey("nominees.id"), index=True)
+    # Denormalized from the nominee so the per-category uniqueness constraint can
+    # exist at the database level.
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), index=True)
     voter_fingerprint: Mapped[str] = mapped_column(String(128), index=True)
-    ip_hash: Mapped[str | None] = mapped_column(String(128))
+    ip_hash: Mapped[str | None] = mapped_column(String(128), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     nominee: Mapped[Nominee] = relationship(back_populates="votes")
@@ -145,6 +151,9 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.judge)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Bumped whenever the password changes (or a manual revoke) so previously
+    # issued JWTs stop validating — real revocation without server-side sessions.
+    token_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     scores: Mapped[list["Score"]] = relationship(back_populates="judge")

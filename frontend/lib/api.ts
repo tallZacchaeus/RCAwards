@@ -11,12 +11,18 @@ import type {
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 
+// Cap how long a server render waits on the API. Without this, an up-but-slow
+// backend (cold DB, launch-night load) hangs the whole page's TTFB. The callers
+// below already fall back gracefully when the fetch throws (incl. on timeout).
+const FETCH_TIMEOUT_MS = 3500;
+
 /** Fetch live categories from the backend, falling back to the static list
  *  when the API is unreachable (e.g. at build time or offline). */
 export async function getCategories(): Promise<CategorySummary[]> {
   try {
     const res = await fetch(`${API_BASE}/categories`, {
       next: { revalidate: 300 },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) throw new Error(`API ${res.status}`);
     const data = (await res.json()) as CategorySummary[];
@@ -42,6 +48,7 @@ export async function getCategory(slug: string): Promise<CategoryDetail | null> 
   try {
     const res = await fetch(`${API_BASE}/categories/${slug}`, {
       next: { revalidate: 300 },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     return (await res.json()) as CategoryDetail;
@@ -63,7 +70,10 @@ export async function uploadFile(file: File): Promise<{ url: string }> {
 
 export async function getVotingStatus(): Promise<VotingStatus> {
   try {
-    const res = await fetch(`${API_BASE}/voting/status`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE}/voting/status`, {
+      next: { revalidate: 60 },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
     if (!res.ok) throw new Error();
     return (await res.json()) as VotingStatus;
   } catch {
@@ -75,6 +85,7 @@ export async function getNominees(categorySlug: string): Promise<Nominee[]> {
   try {
     const res = await fetch(`${API_BASE}/nominees?category=${categorySlug}`, {
       next: { revalidate: 30 },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return [];
     return (await res.json()) as Nominee[];
@@ -85,25 +96,43 @@ export async function getNominees(categorySlug: string): Promise<Nominee[]> {
 
 export type VoteOutcome =
   | { ok: true; voteCount: number }
-  | { ok: false; status: number; message: string };
+  | { ok: false; status: number; message: string; code?: string };
 
 export async function castVote(
   nomineeId: number,
   fingerprint: string
 ): Promise<VoteOutcome> {
-  const res = await fetch(`${API_BASE}/votes`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nominee_id: nomineeId, voter_fingerprint: fingerprint }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/votes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nominee_id: nomineeId, voter_fingerprint: fingerprint }),
+    });
+  } catch {
+    // Network failure / server unreachable — surface it instead of leaving the
+    // caller's pending state hanging forever.
+    return {
+      ok: false,
+      status: 0,
+      code: "network",
+      message: "Could not reach the server. Check your connection and try again.",
+    };
+  }
   if (res.ok) {
     const data = (await res.json()) as { vote_count: number };
     return { ok: true, voteCount: data.vote_count };
   }
   const detail = await res.json().catch(() => null);
+  const body = detail?.detail;
+  // Backend returns { detail: { code, message } } for vote conflicts; older
+  // endpoints may return a plain string.
   const message =
-    typeof detail?.detail === "string" ? detail.detail : "Could not record your vote.";
-  return { ok: false, status: res.status, message };
+    typeof body === "string"
+      ? body
+      : body?.message ?? "Could not record your vote.";
+  const code = body && typeof body === "object" ? (body.code as string) : undefined;
+  return { ok: false, status: res.status, message, code };
 }
 
 export type SubmitResult =
@@ -116,11 +145,22 @@ export async function submitNomination(
   files: FileRef[],
   website = ""
 ): Promise<SubmitResult> {
-  const res = await fetch(`${API_BASE}/nominations`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ category_slug: categorySlug, answers, files, website }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/nominations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category_slug: categorySlug, answers, files, website }),
+    });
+  } catch {
+    // Network failure — return a result the form can show, never throw (which
+    // would leave the submit button stuck disabled and strand the answers).
+    return {
+      ok: false,
+      fieldErrors: {},
+      message: "Could not reach the server. Your answers are still here — check your connection and try again.",
+    };
+  }
 
   if (res.status === 201) {
     const data = (await res.json()) as { id: number };

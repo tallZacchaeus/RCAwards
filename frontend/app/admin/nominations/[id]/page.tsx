@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink, Star } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import {
   type NominationDetail,
+  getMyScore,
   getNomination,
   shortlistNomination,
   submitScore,
@@ -31,7 +32,10 @@ export default function NominationDetailPage() {
   const [category, setCategory] = useState<CategoryDetail | null>(null);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [notice, setNotice] = useState<string>();
-  const [error, setError] = useState<string>();
+  const [loadError, setLoadError] = useState<string>();
+  const [actionError, setActionError] = useState<string>();
+  const [shortlisting, setShortlisting] = useState(false);
+  const [savingScores, setSavingScores] = useState(false);
 
   useEffect(() => {
     getNomination(nominationId)
@@ -40,10 +44,18 @@ export default function NominationDetailPage() {
         return getCategory(n.category_slug);
       })
       .then((c) => setCategory(c))
-      .catch((e) => setError(e.message));
+      .catch((e) => setLoadError(e.message));
+    // Prefill the judge's own existing scores so re-scoring doesn't start blank.
+    getMyScore(nominationId)
+      .then((s) => {
+        if (s?.criteria) setScores(s.criteria);
+      })
+      .catch(() => {});
   }, [nominationId]);
 
-  if (error) return <p className="text-sm text-red-400">{error}</p>;
+  // Only a load failure replaces the page; action failures show inline (below)
+  // so an in-progress score is never wiped by a transient error.
+  if (loadError) return <p className="text-sm text-red-400">{loadError}</p>;
   if (!nom) return <p className="text-ink-muted">Loading…</p>;
 
   const fields = category ? allFields(category.form) : [];
@@ -53,35 +65,50 @@ export default function NominationDetailPage() {
   const fileFor = (key: string) => nom.files.find((f) => f.field_key === key);
 
   async function changeStatus(status: string) {
+    setNotice(undefined);
+    setActionError(undefined);
     try {
       const updated = await updateStatus(nominationId, status);
       setNom((prev) => (prev ? { ...prev, status: updated.status } : prev));
       setNotice(`Status set to ${status}.`);
     } catch (e) {
-      setError((e as Error).message);
+      setActionError((e as Error).message);
     }
   }
 
   async function shortlist() {
+    if (shortlisting) return;
+    setNotice(undefined);
+    setActionError(undefined);
+    setShortlisting(true);
     try {
       await shortlistNomination(nominationId);
       setNom((prev) => (prev ? { ...prev, status: "shortlisted" } : prev));
       setNotice("Added to the voting slate as a nominee.");
     } catch (e) {
-      setError((e as Error).message);
+      setActionError((e as Error).message);
+    } finally {
+      setShortlisting(false);
     }
   }
 
   async function saveScores() {
+    if (savingScores) return;
+    setNotice(undefined);
+    setActionError(undefined);
+    setSavingScores(true);
     try {
       const result = await submitScore(nominationId, scores);
       setNotice(`Score saved (total ${result.total}).`);
     } catch (e) {
-      setError((e as Error).message);
+      setActionError((e as Error).message);
+    } finally {
+      setSavingScores(false);
     }
   }
 
   const scoredCount = Object.keys(scores).length;
+  const criteriaCount = criteria.length;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
@@ -111,6 +138,14 @@ export default function NominationDetailPage() {
       {notice && (
         <p className="rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-gold-hi">
           {notice}
+        </p>
+      )}
+      {actionError && (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+        >
+          {actionError}
         </p>
       )}
 
@@ -164,9 +199,22 @@ export default function NominationDetailPage() {
               />
             </div>
           ))}
-          <Button onClick={saveScores} disabled={scoredCount === 0} size="sm" className="self-start">
-            Save scores
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={saveScores}
+              disabled={scoredCount === 0 || savingScores}
+              size="sm"
+              className="self-start"
+            >
+              {savingScores ? "Saving…" : "Save scores"}
+            </Button>
+            {criteriaCount > 0 && scoredCount < criteriaCount && (
+              <p className="text-xs text-ink-muted">
+                {scoredCount} of {criteriaCount} criteria scored. Saving keeps any
+                criteria you leave blank at their previous value.
+              </p>
+            )}
+          </div>
         </section>
       )}
 
@@ -190,8 +238,8 @@ export default function NominationDetailPage() {
             ))}
           </div>
           <div className="border-t border-line pt-4">
-            <Button variant="outline" size="sm" onClick={shortlist}>
-              <Star className="h-4 w-4" /> Add to voting slate
+            <Button variant="outline" size="sm" onClick={shortlist} disabled={shortlisting}>
+              <Star className="h-4 w-4" /> {shortlisting ? "Adding…" : "Add to voting slate"}
             </Button>
           </div>
         </section>
