@@ -33,6 +33,9 @@ class StoredFile:
     size: int
 
 
+_CHUNK = 1024 * 1024  # 1 MB
+
+
 async def save_upload(file: UploadFile) -> StoredFile:
     settings = get_settings()
 
@@ -42,26 +45,40 @@ async def save_upload(file: UploadFile) -> StoredFile:
             detail=f"Unsupported file type: {file.content_type}",
         )
 
-    data = await file.read()
     max_bytes = settings.max_upload_mb * 1024 * 1024
-    if len(data) > max_bytes:
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File exceeds {settings.max_upload_mb} MB limit",
-        )
-
     upload_id = uuid.uuid4().hex
     ext = _EXT_BY_TYPE.get(file.content_type, "")
     stored_name = f"{upload_id}{ext}"
 
     upload_dir = Path(settings.upload_dir)
     upload_dir.mkdir(parents=True, exist_ok=True)
-    (upload_dir / stored_name).write_bytes(data)
+    dest = upload_dir / stored_name
+
+    # Stream to disk in chunks, aborting the moment the running total exceeds the
+    # limit. This bounds memory to one chunk regardless of the incoming body size,
+    # so an oversized upload can't be buffered whole into RAM to exhaust a worker.
+    size = 0
+    try:
+        with dest.open("wb") as out:
+            while True:
+                chunk = await file.read(_CHUNK)
+                if not chunk:
+                    break
+                size += len(chunk)
+                if size > max_bytes:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail=f"File exceeds {settings.max_upload_mb} MB limit",
+                    )
+                out.write(chunk)
+    except BaseException:
+        dest.unlink(missing_ok=True)
+        raise
 
     return StoredFile(
         upload_id=upload_id,
         url=f"{settings.upload_base_url}/{stored_name}",
         filename=file.filename or stored_name,
         content_type=file.content_type,
-        size=len(data),
+        size=size,
     )

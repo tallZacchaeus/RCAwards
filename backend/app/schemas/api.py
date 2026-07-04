@@ -25,9 +25,9 @@ class CategoryDetail(CategorySummary):
 # --- Nominations --------------------------------------------------------------
 
 class FileRef(BaseModel):
-    field_key: str
-    url: str
-    kind: Optional[str] = None
+    field_key: str = Field(max_length=120)
+    url: str = Field(max_length=500)
+    kind: Optional[str] = Field(default=None, max_length=80)
 
 
 class NominationCreate(BaseModel):
@@ -88,6 +88,28 @@ class UserCreate(BaseModel):
     password: str = Field(min_length=8)
     name: Optional[str] = None
     role: str = "judge"
+
+
+class UserUpdate(BaseModel):
+    # Any subset; omitted fields are left unchanged.
+    active: Optional[bool] = None
+    role: Optional[str] = None
+    password: Optional[str] = Field(default=None, min_length=8)
+
+
+class CategoryFlagsUpdate(BaseModel):
+    # Operational toggles for a category; omitted fields are left unchanged.
+    nominations_open: Optional[bool] = None
+    voting_enabled: Optional[bool] = None
+    active: Optional[bool] = None
+
+
+class CategoryFlags(BaseModel):
+    slug: str
+    name: str
+    nominations_open: bool
+    voting_enabled: bool
+    active: bool
 
 
 # --- Admin / judging ----------------------------------------------------------
@@ -157,9 +179,9 @@ class NomineeOut(BaseModel):
 
 class NomineeCreate(BaseModel):
     category_slug: str
-    display_name: str
+    display_name: str = Field(max_length=200)
     summary: Optional[str] = None
-    photo_url: Optional[str] = None
+    photo_url: Optional[str] = Field(default=None, max_length=500)
     source_nomination_id: Optional[int] = None
 
 

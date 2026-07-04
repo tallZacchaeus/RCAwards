@@ -24,6 +24,22 @@ export function Countdown() {
     return () => clearInterval(id);
   }, [target]);
 
+  // Once the event has started, don't sit on a frozen "00 00 00 00".
+  const isOver =
+    mounted && time.days === 0 && time.hours === 0 && time.minutes === 0 && time.seconds === 0;
+  if (isOver) {
+    return (
+      <div className="flex flex-col gap-2">
+        <span className="display text-[clamp(2rem,6vw,4rem)] leading-none text-gold">
+          The night has arrived
+        </span>
+        <span className="eyebrow text-ink-muted">
+          {EVENT.dateLabel} · Celebrating excellence
+        </span>
+      </div>
+    );
+  }
+
   const units = [
     { label: "Days", value: time.days },
     { label: "Hours", value: time.hours },

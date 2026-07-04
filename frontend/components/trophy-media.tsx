@@ -22,7 +22,15 @@ export function TrophyMedia({
     const canWebm = document
       .createElement("video")
       .canPlayType('video/webm; codecs="vp9"');
-    if (!canWebm) setMode("gif");
+    // Safari/iOS report they can play VP9-in-WebM but do NOT composite its alpha
+    // channel — the transparent trophy would render over an opaque black box. So
+    // fall back to the GIF on any Apple browser regardless of canPlayType.
+    const ua = navigator.userAgent;
+    const isApple =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.vendor?.includes("Apple") ?? false) ||
+      (/^((?!chrome|android|crios|fxios).)*safari/i.test(ua));
+    if (!canWebm || isApple) setMode("gif");
   }, []);
 
   if (mode === "gif") {

@@ -31,6 +31,12 @@ export function Hero() {
       ref={root}
       className="surface-dark relative flex min-h-screen flex-col overflow-hidden px-5 pb-10 pt-24 sm:px-8"
     >
+      {/* The visible wordmark is decorative (aria-hidden); this is the real,
+          visually-hidden page heading for screen readers and SEO. */}
+      <h1 className="sr-only">
+        The Redemption City Awards of Excellence 2026 — powered by City Breed
+      </h1>
+
       {/* Top meta row */}
       <div className="mx-auto flex w-full max-w-7xl items-start justify-between">
         <p className="hero-meta eyebrow max-w-[12rem] text-ink-muted">

@@ -8,10 +8,11 @@ export const EVENT = {
   tagline: "Excellence in motion. Greatness within reach.",
   poweredBy: "City Breed",
   social: "@thecitybreed",
-  // Wednesday, 29 July 2026 — from the official flyer.
-  dateISO: "2026-07-29T19:00:00",
+  // Wednesday, 29 July 2026, 7pm WAT — from the official flyer. The +01:00 offset
+  // makes the countdown target an absolute instant, not each visitor's local 7pm.
+  dateISO: "2026-07-29T19:00:00+01:00",
   dateLabel: "Wednesday, 29 July 2026",
-  nominateUrl: "https://www.thecitybreed.org/",
+  nominateUrl: "/nominate",
 };
 
 export const NAV = [
@@ -150,9 +151,13 @@ export const FALLBACK_CATEGORIES: CategorySummary[] = [
   { slug: "sports-development", name: "Sports Development", group: "regional", description: "Promoting sports and wellness for youth engagement and unity." },
   { slug: "agricultural-innovation", name: "Agricultural Innovation", group: "regional", description: "Innovative projects, food security, and agribusiness empowerment." },
   { slug: "departmental-sanitation", name: "Sanitation Department", group: "departmental", description: "Individual excellence in the Sanitation department." },
+  { slug: "departmental-water", name: "Water Department", group: "departmental", description: "Individual excellence in the Water department." },
   { slug: "departmental-health", name: "Health Department", group: "departmental", description: "Individual excellence in the Health department." },
-  { slug: "departmental-security", name: "Security Department", group: "departmental", description: "Individual excellence in the Security department." },
+  { slug: "departmental-environmental-health", name: "Environmental Health Department", group: "departmental", description: "Individual excellence in the Environmental Health department." },
   { slug: "departmental-maintenance", name: "Maintenance Department", group: "departmental", description: "Individual excellence in the Maintenance department." },
+  { slug: "departmental-electronics", name: "Electronics Department", group: "departmental", description: "Individual excellence in the Electronics department." },
+  { slug: "departmental-transport", name: "Transport Department", group: "departmental", description: "Individual excellence in the Transport department." },
+  { slug: "departmental-security", name: "Security Department", group: "departmental", description: "Individual excellence in the Security department." },
   { slug: "satgo-evangelism", name: "Evangelism Youth Province", group: "satgo", description: "Exceptional commitment to evangelism, discipleship, and outreach." },
   { slug: "satgo-fastest-growing", name: "Fastest Growing Youth Province", group: "satgo", description: "Remarkable growth in spiritual development and youth engagement." },
   { slug: "satgo-outstanding", name: "Outstanding Youth Province", group: "satgo", description: "Excellence across ministry, innovation, and leadership development." },

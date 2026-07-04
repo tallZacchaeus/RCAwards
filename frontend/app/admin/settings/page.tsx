@@ -5,10 +5,26 @@ import { type AdminSettings, getSettings, updateSettings } from "@/lib/admin-api
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-/** ISO string → value for <input type="datetime-local"> (YYYY-MM-DDTHH:mm). */
+/** Timezone-aware ISO → value for <input type="datetime-local"> in the admin's
+ *  local time (YYYY-MM-DDTHH:mm). */
 function toLocalInput(iso: string | null): string {
-  return iso ? iso.slice(0, 16) : "";
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const offsetMs = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16);
 }
+
+/** datetime-local wall-clock value (interpreted as the admin's local time) →
+ *  UTC ISO string with offset, so the backend stores an unambiguous instant. */
+function toIso(localValue: string): string {
+  return localValue ? new Date(localValue).toISOString() : "";
+}
+
+const TZ =
+  typeof Intl !== "undefined"
+    ? Intl.DateTimeFormat().resolvedOptions().timeZone
+    : "local time";
 
 export default function SettingsPage() {
   const [opens, setOpens] = useState("");
@@ -37,8 +53,8 @@ export default function SettingsPage() {
     setError(undefined);
     try {
       const payload: Partial<AdminSettings> = {
-        voting_opens_at: opens ? `${opens}:00` : "",
-        voting_closes_at: closes ? `${closes}:00` : "",
+        voting_opens_at: toIso(opens),
+        voting_closes_at: toIso(closes),
         voting_results_public: resultsPublic,
       };
       await updateSettings(payload);
@@ -56,6 +72,7 @@ export default function SettingsPage() {
         <h1 className="font-serif text-3xl text-ink">Settings</h1>
         <p className="text-sm text-ink-muted">
           Control the public voting window and whether live results are shown.
+          Times are in your local timezone (<span className="text-ink">{TZ}</span>).
         </p>
       </header>
 

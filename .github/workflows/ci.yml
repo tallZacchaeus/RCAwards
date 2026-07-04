@@ -27,6 +27,43 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
 
+  migrations:
+    name: Migrations (MariaDB)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: rcawards
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      # Exercise the migration DDL against the real production dialect (MariaDB),
+      # which the SQLite-based test fixtures cannot catch. Idempotency is checked
+      # by running upgrade twice.
+      - name: Apply migrations on MariaDB
+        env:
+          DATABASE_URL: mysql+pymysql://root:root@127.0.0.1:3306/rcawards
+          JWT_SECRET: ci-migration-secret-not-used-for-auth-000000
+        run: |
+          alembic upgrade head
+          alembic current
+
   frontend:
     name: Frontend (build)
     runs-on: ubuntu-latest

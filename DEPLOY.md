@@ -98,6 +98,11 @@ docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 docker compose -f docker-compose.prod.yml exec backend python -m app.seed.loader
 docker compose -f docker-compose.prod.yml exec backend \
   python -m app.manage create-admin --email you@thecitybreed.org --password 'a-strong-password'
+# Create the judge panel — each judge gets a UNIQUE random password, printed once.
+# Record the output and give each judge their own credentials (no shared password).
+docker compose -f docker-compose.prod.yml exec backend python -m app.manage seed-judges
+# Rotate any single account later with:
+#   python -m app.manage reset-password --email judge@judges.rcawards.local
 ```
 
 ## 7. Verify & go-live checklist
@@ -106,12 +111,14 @@ docker compose -f docker-compose.prod.yml exec backend \
 curl https://awards.thecitybreed.org/api/health   # {"status":"ok",...}
 ```
 
-- [ ] Migrations run, categories seeded, first admin created (extra judges via
-      `python -m app.manage create-user` or Admin → Users).
+- [ ] Migrations run, categories seeded, first admin created, judge panel seeded
+      with unique passwords (`python -m app.manage seed-judges`).
 - [ ] Homepage loads over HTTPS; certificate is valid.
 - [ ] Smoke test: submit a nomination **with a file upload**, log into `/admin`,
       score it, shortlist a nominee, cast a vote.
-- [ ] Set the voting window in **Admin → Settings** (opens/closes, results visibility).
+- [ ] Set the voting window in **Admin → Settings** (opens/closes, results
+      visibility). Times use *your browser's* timezone (shown on the page) and are
+      stored as an absolute instant — set them from a machine in the event timezone.
 - [ ] Hostinger snapshots on; nightly DB dump cron added (§10).
 - [ ] (Optional) Managed captcha (Turnstile/hCaptcha) on public writes if spam
       becomes an issue — a honeypot ships already.

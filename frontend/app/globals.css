@@ -19,7 +19,9 @@
   --color-rule: rgba(20, 17, 12, 0.12);
 
   /* Gold — accent only (one button, a rule, a mark) */
-  --color-gold-deep: #8c6a1f;
+  /* Darkened from #8c6a1f (4.16:1 on paper — below AA) to meet 4.5:1 for the
+     small eyebrow text that uses it on light sections. */
+  --color-gold-deep: #78591a;
   --color-gold: #c9a24b;
   --color-gold-bright: #d4af37;
   --color-gold-hi: #f8e7a1;
@@ -31,7 +33,7 @@
 
   --font-display: var(--font-manrope), system-ui, sans-serif;
   --font-serif: var(--font-playfair), serif;
-  --font-accent: var(--font-cormorant), serif;
+  --font-accent: var(--font-playfair), serif;
   --font-sans: var(--font-manrope), system-ui, sans-serif;
   --font-wordmark: var(--font-cinzel), serif;
 }

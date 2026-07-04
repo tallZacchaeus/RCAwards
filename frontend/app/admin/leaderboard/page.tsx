@@ -85,8 +85,8 @@ export default function LeaderboardPage() {
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
-      <div className="overflow-hidden rounded-2xl border border-line">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-line">
+        <table className="w-full min-w-[40rem] text-left text-sm">
           <thead className="bg-bg-raised/60 text-xs uppercase tracking-wider text-ink-muted">
             <tr>
               <th className="px-4 py-3 font-medium">#</th>

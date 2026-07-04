@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..antispam import check_honeypot
+from ..config import get_settings
 from ..db import get_session
 from ..models import Category, Nominee, Setting, Vote
 from ..ratelimit import rate_limit
@@ -16,6 +17,12 @@ from ..schemas.api import NomineeOut, VoteCreate, VoteResult, VotingStatus
 from ..security import hash_ip
 
 router = APIRouter(tags=["voting"])
+
+
+def _conflict(code: str, message: str, status_code: int = status.HTTP_409_CONFLICT) -> HTTPException:
+    """A machine-readable client error so the frontend can branch on `code`
+    instead of matching on human-readable message text."""
+    return HTTPException(status_code=status_code, detail={"code": code, "message": message})
 
 # Settings keys (rows in the `settings` table).
 KEY_OPENS = "voting_opens_at"
@@ -115,39 +122,64 @@ def cast_vote(
 
     category = session.get(Category, nominee.category_id)
     if category is None or not category.active or not category.voting_enabled:
-        raise HTTPException(status_code=409, detail="Voting is not enabled for this category")
+        raise _conflict("voting_not_enabled", "Voting is not enabled for this category.")
 
     if not _voting_open(session):
-        raise HTTPException(status_code=409, detail="Voting is currently closed")
+        raise _conflict("voting_closed", "Voting is currently closed.")
 
-    # One vote per category per device (fingerprint).
+    # One vote per category per device (fingerprint). This SELECT is a fast path
+    # for a friendly message; the DB constraint (uq_vote_once_per_category) is the
+    # real, race-proof guarantee — enforced below via IntegrityError.
     already = session.scalar(
         select(Vote.id)
-        .join(Nominee, Vote.nominee_id == Nominee.id)
         .where(
-            Nominee.category_id == category.id,
+            Vote.category_id == category.id,
             Vote.voter_fingerprint == payload.voter_fingerprint,
         )
         .limit(1)
     )
     if already:
-        raise HTTPException(status_code=409, detail="You have already voted in this category")
+        raise _conflict("already_voted", "You have already voted in this category.")
 
     client_ip = request.client.host if request.client else "unknown"
+    ip_hash = hash_ip(client_ip)
+
+    # Secondary anti-fraud: cap votes per category from a single IP. Defeats a
+    # script that rotates client-supplied fingerprints from one host, while the
+    # generous default still allows many legitimate voters behind one NAT.
+    settings = get_settings()
+    if request.client is not None:
+        ip_votes = session.scalar(
+            select(func.count(Vote.id)).where(
+                Vote.category_id == category.id, Vote.ip_hash == ip_hash
+            )
+        ) or 0
+        if ip_votes >= settings.max_votes_per_ip_per_category:
+            raise _conflict(
+                "vote_limit",
+                "This network has reached the voting limit for this category.",
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
     vote = Vote(
         nominee_id=nominee.id,
+        category_id=category.id,
         voter_fingerprint=payload.voter_fingerprint,
-        ip_hash=hash_ip(client_ip),
+        ip_hash=ip_hash,
     )
     session.add(vote)
     try:
         session.commit()
     except IntegrityError:
-        # Unique (nominee_id, fingerprint) — double-submit race.
+        # Unique (category_id, fingerprint) or (nominee_id, fingerprint) — a
+        # concurrent double-submit lost the race. Same outcome for the client.
         session.rollback()
-        raise HTTPException(status_code=409, detail="You have already voted for this nominee")
+        raise _conflict("already_voted", "You have already voted in this category.")
 
-    count = session.scalar(
-        select(func.count(Vote.id)).where(Vote.nominee_id == nominee.id)
-    )
-    return VoteResult(nominee_id=nominee.id, vote_count=int(count or 0))
+    # Don't leak live standings while results are private.
+    if _results_public(session):
+        count = session.scalar(
+            select(func.count(Vote.id)).where(Vote.nominee_id == nominee.id)
+        )
+        return VoteResult(nominee_id=nominee.id, vote_count=int(count or 0))
+    return VoteResult(nominee_id=nominee.id, vote_count=0)
