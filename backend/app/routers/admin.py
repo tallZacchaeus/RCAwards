@@ -5,7 +5,7 @@ import csv
 import io
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -509,7 +509,7 @@ def delete_nominee(
     nominee_id: int,
     session: Session = Depends(get_session),
     _: User = Depends(require_admin),
-) -> None:
+) -> Response:
     """Remove a nominee from the voting slate. Deletes its votes too (a mistaken
     shortlist should leave no trace); use rejection to hide without deleting."""
     nominee = session.get(Nominee, nominee_id)
@@ -518,6 +518,9 @@ def delete_nominee(
     session.execute(Vote.__table__.delete().where(Vote.nominee_id == nominee_id))
     session.delete(nominee)
     session.commit()
+    # Return an explicit bodyless Response so FastAPI doesn't infer a response
+    # model for a 204 (which stricter versions reject at import time).
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/nominees/{nominee_id}", response_model=NomineeOut)
