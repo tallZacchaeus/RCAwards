@@ -3,12 +3,12 @@ import { Reveal } from "./reveal";
 // Real 2025 honourees on stage. We show the photographs without asserting names —
 // swap in verified names/categories here once the roll of honour is confirmed.
 const PAST_WINNERS = [
-  { year: "2025", image: "/brand/winners/winner1.jpg" },
-  { year: "2025", image: "/brand/winners/winner2.jpg" },
-  { year: "2025", image: "/brand/winners/winner3.jpg" },
-  { year: "2025", image: "/brand/winners/winner4.jpg" },
-  { year: "2025", image: "/brand/winners/winner5.jpg" },
-  { year: "2025", image: "/brand/winners/winner6.jpg" },
+  { year: "2025", image: "/brand/winners/winner1-800.webp" },
+  { year: "2025", image: "/brand/winners/winner2-800.webp" },
+  { year: "2025", image: "/brand/winners/winner3-800.webp" },
+  { year: "2025", image: "/brand/winners/winner4-800.webp" },
+  { year: "2025", image: "/brand/winners/winner5-800.webp" },
+  { year: "2025", image: "/brand/winners/winner6-800.webp" },
 ];
 
 export function WinnersGallery() {
@@ -37,6 +37,7 @@ export function WinnersGallery() {
                   src={w.image}
                   alt={`Honouree on stage at the ${w.year} Redemption City Awards`}
                   loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover grayscale-[0.15] transition-transform duration-700 ease-out group-hover:scale-105"
                 />
                 <span className="absolute left-3 top-3 font-sans text-xs tabular-nums text-ink/45">
