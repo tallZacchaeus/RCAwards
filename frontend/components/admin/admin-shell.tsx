@@ -37,6 +37,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
                   active
@@ -76,18 +77,30 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </button>
         </header>
         <nav className="flex gap-1 overflow-x-auto border-b border-line px-3 py-2 md:hidden">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs text-ink-muted hover:text-gold"
-            >
-              {item.label}
-            </Link>
-          ))}
+          {items.map((item) => {
+            const active = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "whitespace-nowrap rounded-lg px-3 py-1.5 text-xs transition-colors",
+                  active ? "bg-gold/10 text-gold-hi" : "text-ink-muted hover:text-gold"
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <main className="min-w-0 flex-1 px-5 py-8 sm:px-8">{children}</main>
+        <main className="min-w-0 flex-1 px-5 py-8 sm:px-8">
+          {/* Re-mount keyed by route so each admin page fades in on navigation. */}
+          <div key={pathname} className="page-enter">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

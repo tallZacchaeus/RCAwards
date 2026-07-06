@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="surface-dark relative flex min-h-screen flex-col justify-center gap-10 overflow-hidden px-5 pb-14 pt-24 sm:px-8"
+      className="hero-enter surface-dark relative flex min-h-screen flex-col justify-center gap-10 overflow-hidden px-5 pb-14 pt-24 sm:px-8"
     >
       {/* The carousel images carry the visible branding; this is the real,
           visually-hidden page heading for screen readers and SEO. */}
@@ -41,13 +41,13 @@ export function Hero() {
         <div className="flex shrink-0 items-center gap-3">
           <Link
             href="/nominate"
-            className="rounded-full bg-gold px-7 py-3 text-sm font-semibold text-bg transition-colors hover:bg-gold-bright"
+            className="btn-press focus-ring rounded-full bg-gold px-7 py-3 text-sm font-semibold text-bg hover:bg-gold-bright"
           >
             Nominate
           </Link>
           <Link
             href="/vote"
-            className="rounded-full border border-line px-7 py-3 text-sm font-semibold text-ink transition-colors hover:border-gold/50"
+            className="btn-press focus-ring rounded-full border border-line px-7 py-3 text-sm font-semibold text-ink hover:border-gold/50"
           >
             Vote
           </Link>

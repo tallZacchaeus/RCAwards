@@ -104,7 +104,7 @@ export function VoteGallery({
             <article
               key={n.id}
               className={cn(
-                "group relative flex flex-col gap-5 border p-6 transition-colors duration-300",
+                "card-lift group relative flex flex-col gap-5 border p-6 transition-colors duration-300",
                 isVoted
                   ? "border-gold/60 bg-bg-elevated"
                   : "border-line bg-bg-raised/50 hover:border-gold/40"

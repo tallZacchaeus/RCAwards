@@ -1,9 +1,10 @@
 import { JURY } from "@/lib/site";
 import { Reveal } from "./reveal";
+import { CountUp } from "./count-up";
 
-const STATS = [
-  { value: "23", label: "Categories" },
-  { value: String(JURY.length), label: "Jurors" },
+const STATS: { value: string; label: string; count?: number }[] = [
+  { value: "23", label: "Categories", count: 23 },
+  { value: String(JURY.length), label: "Jurors", count: JURY.length },
   { value: "4th", label: "Edition" },
   { value: "2026", label: "The Night" },
 ];
@@ -14,8 +15,8 @@ export function Stats() {
       <Reveal className="mx-auto grid max-w-7xl grid-cols-2 gap-y-10 px-5 py-16 sm:px-8 lg:grid-cols-4 lg:divide-x lg:divide-line">
         {STATS.map((s) => (
           <div key={s.label} className="flex flex-col gap-1 lg:items-center lg:px-6">
-            <span className="display text-[clamp(3rem,7vw,5.5rem)] leading-none text-gold">
-              {s.value}
+            <span className="display text-[clamp(3rem,7vw,5.5rem)] leading-none text-gold tabular-nums">
+              {s.count !== undefined ? <CountUp to={s.count} /> : s.value}
             </span>
             <span className="eyebrow text-ink-muted">{s.label}</span>
           </div>

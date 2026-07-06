@@ -13,7 +13,7 @@ export function HowToNominate() {
           </div>
           <Link
             href="/nominate"
-            className="shrink-0 rounded-full bg-gold px-7 py-3 text-sm font-semibold text-bg transition-colors hover:bg-gold-bright"
+            className="btn-press focus-ring shrink-0 rounded-full bg-gold px-7 py-3 text-sm font-semibold text-bg hover:bg-gold-bright"
           >
             Open the portal
           </Link>
