@@ -63,13 +63,13 @@ export function SiteHeader() {
           <Link
             href="/admin/login"
             aria-label="Sign in"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:text-gold"
+            className="btn-press focus-ring flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-muted hover:text-gold"
           >
             <User className="h-4 w-4" />
           </Link>
           <Link
             href="/vote"
-            className="hidden rounded-full border border-line px-6 py-2 text-sm font-semibold text-ink transition-colors hover:border-gold/50 sm:inline-block"
+            className="btn-press focus-ring hidden rounded-full border border-line px-6 py-2 text-sm font-semibold text-ink hover:border-gold/50 sm:inline-block"
           >
             Vote
           </Link>
@@ -113,7 +113,7 @@ export function SiteHeader() {
           <Link
             href="/nominate"
             onClick={() => setOpen(false)}
-            className="mt-3 rounded-full bg-gold px-6 py-2.5 text-center text-sm font-semibold text-bg"
+            className="btn-press focus-ring mt-3 rounded-full bg-gold px-6 py-2.5 text-center text-sm font-semibold text-bg"
           >
             Nominate
           </Link>

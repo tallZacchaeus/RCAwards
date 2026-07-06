@@ -120,18 +120,6 @@ body {
 .hairline { height: 1px; background: var(--color-line); }
 .rule { height: 1px; background: var(--color-rule); }
 
-/* ── Marquee ───────────────────────────────────────────────────────── */
-@keyframes marqueeScroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marqueeScroll 30s linear infinite;
-}
-.marquee-track:hover { animation-play-state: paused; }
-
 /* ── Editorial link underline ──────────────────────────────────────── */
 .link-underline {
   background-image: linear-gradient(currentColor, currentColor);
@@ -142,30 +130,51 @@ body {
 }
 .link-underline:hover { background-size: 100% 1px; }
 
-/* ── Keyframes still referenced by existing components ─────────────── */
-/* (will be removed as each section is reskinned in later phases) */
-@keyframes floatUp {
-  0% { transform: translateY(0); opacity: 0; }
-  10% { opacity: 0.6; }
-  100% { transform: translateY(-90vh); opacity: 0; }
+/* ── Micro-interactions ────────────────────────────────────────────── *
+ * Reusable, GPU-friendly (transform/opacity only) and reduced-motion aware.
+ * Kept in CSS so both the shadcn Button and hand-rolled marketing pills share
+ * exactly the same press feel and focus ring. */
+
+/* Press feedback for buttons/CTAs — subtle scale on active, quick easing. */
+.btn-press {
+  transition:
+    transform 0.18s var(--ease-out-expo),
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
-@keyframes glowBreath {
-  0%, 100% { opacity: 0.1; }
-  50% { opacity: 0.18; }
+.btn-press:active { transform: scale(0.97); }
+
+/* Focus ring for interactive elements on the dark surface. */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-gold);
 }
-@keyframes orbitSpin { to { transform: rotate(360deg); } }
-@keyframes orbitSpinReverse { to { transform: rotate(-360deg); } }
-@keyframes drawLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes flipIn { from { transform: rotateX(-90deg); opacity: 0; } to { transform: rotateX(0); opacity: 1; } }
 
-.trophy-float { animation: none; }
-.trophy-shine { display: none; }
+/* Hover lift for card surfaces — pairs with a border/color change. */
+.card-lift { transition: transform 0.3s var(--ease-out-expo), border-color 0.3s ease; }
+.card-lift:hover { transform: translateY(-3px); }
 
-.flip-digit { display: inline-block; }
-.flip-digit.is-flipping { animation: flipIn 0.35s var(--ease-out-expo) both; }
+/* Staggered entrance for above-the-fold hero content (no JS, no CLS). */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-enter > * { animation: heroRise 0.7s var(--ease-out-expo) both; }
+.hero-enter > *:nth-child(2) { animation-delay: 0.08s; }
+.hero-enter > *:nth-child(3) { animation-delay: 0.16s; }
+.hero-enter > *:nth-child(4) { animation-delay: 0.24s; }
 
-.cv-auto { content-visibility: auto; contain-intrinsic-block-size: auto 600px; }
+/* Per-route content entrance (e.g. admin pages, keyed by pathname). */
+.page-enter { animation: heroRise 0.45s var(--ease-out-expo) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-press:active { transform: none; }
+  .card-lift:hover { transform: none; }
+  .hero-enter > * { animation: none; }
+  .page-enter { animation: none; }
+}
 
 .mobile-nav {
   overflow: hidden;

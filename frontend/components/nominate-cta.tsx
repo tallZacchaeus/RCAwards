@@ -52,13 +52,13 @@ export function NominateCta() {
           <div className="flex items-center gap-3">
             <Link
               href="/nominate"
-              className="rounded-full bg-gold px-8 py-3.5 text-sm font-semibold text-bg transition-colors hover:bg-gold-bright"
+              className="btn-press focus-ring rounded-full bg-gold px-8 py-3.5 text-sm font-semibold text-bg hover:bg-gold-bright"
             >
               Submit a Nomination
             </Link>
             <Link
               href="/vote"
-              className="rounded-full border border-line px-8 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-gold/50"
+              className="btn-press focus-ring rounded-full border border-line px-8 py-3.5 text-sm font-semibold text-ink hover:border-gold/50"
             >
               Vote
             </Link>
@@ -82,7 +82,7 @@ export function NominateCta() {
               <button
                 type="submit"
                 disabled={status === "loading" || status === "done"}
-                className="shrink-0 rounded-full border border-line px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-gold/50 disabled:opacity-60"
+                className="btn-press focus-ring shrink-0 rounded-full border border-line px-5 py-3 text-sm font-semibold text-ink hover:border-gold/50 disabled:opacity-60"
               >
                 {status === "done" ? "Done" : status === "loading" ? "…" : "Notify"}
               </button>
