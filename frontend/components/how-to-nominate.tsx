@@ -4,7 +4,7 @@ import { Reveal } from "./reveal";
 
 export function HowToNominate() {
   return (
-    <section className="surface-dark border-y border-line">
+    <section id="how-to-nominate" className="surface-dark border-y border-line">
       <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:py-32">
         <Reveal className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
           <div className="flex flex-col gap-4">

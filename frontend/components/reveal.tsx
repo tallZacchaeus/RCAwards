@@ -40,9 +40,17 @@ export function Reveal({
     // Respect reduced-motion preference
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const targets: Element[] = stagger
-      ? Array.from(el.children)
-      : [el];
+    // When staggering, animate the direct children. If the sole child is a
+    // <ul>/<ol>, drill into it so the list items cascade while keeping ul>li
+    // semantics intact.
+    let container: Element = el;
+    if (stagger && el.children.length === 1) {
+      const first = el.firstElementChild;
+      if (first && (first.tagName === "UL" || first.tagName === "OL")) {
+        container = first;
+      }
+    }
+    const targets: Element[] = stagger ? Array.from(container.children) : [el];
 
     // Apply initial hidden styles
     targets.forEach((t, i) => {

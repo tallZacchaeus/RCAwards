@@ -10,7 +10,6 @@ const QUICK_LINKS = [
 
 const PARTICIPATE = [
   { label: "Nominate", href: "/nominate" },
-  { label: "Vote", href: "/vote" },
   { label: "Nomination Portal", href: EVENT.nominateUrl },
   { label: "Sign in", href: "/admin/login" },
 ];

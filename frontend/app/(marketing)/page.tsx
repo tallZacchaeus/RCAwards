@@ -7,7 +7,7 @@ import { HowToNominate } from "@/components/how-to-nominate";
 import { Categories } from "@/components/categories";
 import { WinnersGallery } from "@/components/winners-gallery";
 import { Gallery } from "@/components/gallery";
-import { MeetJury } from "@/components/jury";
+// import { MeetJury } from "@/components/jury"; // hidden during nominations-only phase
 import { Sponsors } from "@/components/sponsors";
 import { Faq } from "@/components/faq";
 import { NominateCta } from "@/components/nominate-cta";
@@ -24,7 +24,7 @@ export default function Home() {
       <Categories />
       <WinnersGallery />
       <Gallery />
-      <MeetJury />
+      {/* <MeetJury /> — hidden during the nominations-only phase */}
       <Sponsors />
       <Faq />
       <NominateCta />
