@@ -15,8 +15,14 @@ export function AwardFeature() {
             <div className="relative aspect-[4/5] w-full overflow-hidden border border-rule bg-card">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/brand/photos/feature.jpg"
-                alt="A guest at the 2025 ceremony"
+                src="/brand/photos/about.webp"
+                srcSet="/brand/photos/about-600.webp 600w, /brand/photos/about.webp 1120w"
+                sizes="(min-width: 1024px) 560px, 90vw"
+                width={1120}
+                height={1400}
+                alt="A distinguished honouree at the 2025 Redemption City Awards of Excellence ceremony"
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
               <span className="absolute left-4 top-4 eyebrow text-white/80 mix-blend-difference">

@@ -63,7 +63,11 @@ export function HeroCarousel() {
             alt={s.alt}
             aria-hidden={i !== active}
             draggable={false}
+            width={1920}
+            height={1080}
             loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
+            decoding="async"
             className={cn(
               "absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out motion-reduce:transition-none",
               i === active ? "opacity-100" : "opacity-0"
