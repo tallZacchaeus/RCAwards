@@ -68,10 +68,10 @@ export function SiteHeader() {
             <User className="h-4 w-4" />
           </Link>
           <Link
-            href="/vote"
-            className="btn-press focus-ring hidden rounded-full border border-line px-6 py-2 text-sm font-semibold text-ink hover:border-gold/50 sm:inline-block"
+            href="/nominate"
+            className="btn-press focus-ring hidden rounded-full bg-gold px-6 py-2 text-sm font-semibold text-bg hover:bg-gold-bright sm:inline-block"
           >
-            Vote
+            Nominate
           </Link>
 
           {/* Mobile hamburger */}

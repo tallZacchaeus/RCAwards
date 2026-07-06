@@ -15,12 +15,13 @@ export const EVENT = {
   nominateUrl: "/nominate",
 };
 
+// Voting + jury are hidden while the platform is in the nominations-only phase.
+// Re-add { label: "Jury", href: "/#jury" } and { label: "Vote", href: "/vote" }
+// (and re-enable the sections/CTAs) once judging/voting opens.
 export const NAV = [
   { label: "About", href: "/#about" },
   { label: "Categories", href: "/#categories" },
   { label: "Winners", href: "/#winners" },
-  { label: "Jury", href: "/#jury" },
-  { label: "Vote", href: "/vote" },
   { label: "Nominate", href: "/nominate" },
 ];
 

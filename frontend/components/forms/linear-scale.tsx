@@ -28,7 +28,7 @@ export function LinearScale({
               onClick={() => onChange(n)}
               aria-pressed={active}
               className={cn(
-                "aspect-square rounded-lg border text-sm font-medium transition-all",
+                "btn-press focus-ring aspect-square rounded-lg border text-sm font-medium",
                 active
                   ? "border-gold bg-gold text-bg"
                   : "border-line text-ink-muted hover:border-gold/50 hover:text-gold"

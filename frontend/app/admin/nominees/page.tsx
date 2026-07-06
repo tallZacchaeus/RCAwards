@@ -154,8 +154,10 @@ export default function NomineesPage() {
                   <button
                     onClick={() => toggleWinner(n)}
                     title={n.is_winner ? "Remove winner" : "Crown winner"}
+                    aria-label={n.is_winner ? `Remove ${n.display_name} as winner` : `Crown ${n.display_name} as winner`}
+                    aria-pressed={n.is_winner}
                     className={cn(
-                      "shrink-0 rounded-full border p-2 transition-colors",
+                      "btn-press focus-ring shrink-0 rounded-full border p-2",
                       n.is_winner
                         ? "border-gold/60 bg-gold/15 text-gold-hi"
                         : "border-line text-ink-muted hover:text-gold"

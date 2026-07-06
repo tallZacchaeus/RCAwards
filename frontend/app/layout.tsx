@@ -20,12 +20,11 @@ const manrope = Manrope({
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-// A real landscape event photo makes a far better share card than the
-// transparent wordmark. Replace with a dedicated 1200x630 designed image later.
+// Dedicated 1200x630 social card built from the hero title lockup.
 const OG_IMAGE = {
-  url: "/brand/photos/gallery/g20.jpg",
-  width: 1400,
-  height: 933,
+  url: "/brand/og.jpg",
+  width: 1200,
+  height: 630,
   alt: "The Redemption City Awards of Excellence 2026",
 };
 

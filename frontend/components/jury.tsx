@@ -19,7 +19,7 @@ export function MeetJury() {
           </p>
         </Reveal>
 
-        <Reveal className="mt-14 grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal stagger className="mt-14 grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
           {JURY.map((j, i) => (
             <div
               key={i}

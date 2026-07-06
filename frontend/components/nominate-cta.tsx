@@ -56,12 +56,6 @@ export function NominateCta() {
             >
               Submit a Nomination
             </Link>
-            <Link
-              href="/vote"
-              className="btn-press focus-ring rounded-full border border-line px-8 py-3.5 text-sm font-semibold text-ink hover:border-gold/50"
-            >
-              Vote
-            </Link>
           </div>
 
           <div className="w-full max-w-sm">

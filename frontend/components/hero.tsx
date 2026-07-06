@@ -46,10 +46,10 @@ export function Hero() {
             Nominate
           </Link>
           <Link
-            href="/vote"
+            href="/#how-to-nominate"
             className="btn-press focus-ring rounded-full border border-line px-7 py-3 text-sm font-semibold text-ink hover:border-gold/50"
           >
-            Vote
+            How to nominate
           </Link>
         </div>
       </div>

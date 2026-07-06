@@ -38,7 +38,7 @@ export function CategoryIndex({
                 {String(g.items.length).padStart(2, "0")}
               </span>
             </div>
-            <Reveal>
+            <Reveal stagger>
               <ul>
                 {g.items.map((cat, i) => (
                   <CategoryRow
