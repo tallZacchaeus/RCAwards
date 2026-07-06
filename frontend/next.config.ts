@@ -4,9 +4,16 @@ import type { NextConfig } from "next";
 // Next's hydration bootstrap and inline styles without a nonce middleware; the
 // rest is locked to same-origin. connect-src allows the API (same-origin /api in
 // production) and data: for inlined assets. Tighten to nonces in a later pass.
+// React's dev build uses eval() for debugging; production never does. Allow
+// 'unsafe-eval' only in development so the prod CSP stays strict.
+const scriptSrc =
+  process.env.NODE_ENV === "production"
+    ? "script-src 'self' 'unsafe-inline'"
+    : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
