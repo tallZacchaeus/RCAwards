@@ -410,7 +410,7 @@ def nomination_analytics(
     return NominationAnalytics(**compute_nomination_analytics(session, category))
 
 
-@router.get("/nominations/export.xlsx")
+@router.get("/nominations/export/xlsx")
 def export_xlsx(
     category: str | None = Query(None, description="Filter by category slug"),
     session: Session = Depends(get_session),

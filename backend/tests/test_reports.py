@@ -49,7 +49,7 @@ def test_analytics_category_scope_and_404(client, admin_headers):
 
 def test_xlsx_export_shape(client, admin_headers):
     _seed(client, 2)
-    resp = client.get("/admin/nominations/export.xlsx", headers=admin_headers)
+    resp = client.get("/admin/nominations/export/xlsx", headers=admin_headers)
     assert resp.status_code == 200
     assert "spreadsheetml" in resp.headers["content-type"]
     assert resp.headers["content-disposition"].endswith("nominations-all.xlsx")
@@ -64,7 +64,7 @@ def test_xlsx_formula_injection_neutralised(client, admin_headers):
     payload["answers"]["creche_name"] = "=INJECT_TEST_123"
     assert client.post("/nominations", json=payload).status_code == 201
     resp = client.get(
-        "/admin/nominations/export.xlsx?category=creche-of-the-year", headers=admin_headers
+        "/admin/nominations/export/xlsx?category=creche-of-the-year", headers=admin_headers
     )
     assert resp.status_code == 200
     wb = openpyxl.load_workbook(io.BytesIO(resp.content))
@@ -75,8 +75,8 @@ def test_xlsx_formula_injection_neutralised(client, admin_headers):
 
 
 def test_xlsx_admin_only(client, judge_headers):
-    assert client.get("/admin/nominations/export.xlsx").status_code == 401
-    assert client.get("/admin/nominations/export.xlsx", headers=judge_headers).status_code == 403
+    assert client.get("/admin/nominations/export/xlsx").status_code == 401
+    assert client.get("/admin/nominations/export/xlsx", headers=judge_headers).status_code == 403
 
 
 # --- PDF ----------------------------------------------------------------------

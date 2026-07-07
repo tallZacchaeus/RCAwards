@@ -277,7 +277,7 @@ export async function getNominationAnalytics(
 export async function downloadXlsx(category?: string): Promise<void> {
   const q = category ? `?category=${encodeURIComponent(category)}` : "";
   await downloadBlob(
-    await adminFetch(`/admin/nominations/export.xlsx${q}`),
+    await adminFetch(`/admin/nominations/export/xlsx${q}`),
     `nominations-${category || "all"}.xlsx`
   );
 }
