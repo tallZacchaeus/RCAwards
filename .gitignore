@@ -17,6 +17,7 @@ uploads/
 # Environment / secrets
 .env
 .env.local
+.env.bak.*
 *.local
 
 # Node / frontend (Phase 0/3)
