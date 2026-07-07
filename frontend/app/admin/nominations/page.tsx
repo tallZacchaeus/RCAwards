@@ -2,11 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download } from "lucide-react";
+import { Download, FileSpreadsheet, FileText } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import {
   type NominationListItem,
   downloadCsv,
+  downloadXlsx,
+  downloadReport,
   listNominations,
 } from "@/lib/admin-api";
 import { getCategories } from "@/lib/api";
@@ -92,13 +94,29 @@ export default function NominationsPage() {
           </p>
         </div>
         {session?.role === "admin" && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => downloadCsv(category || undefined)}
-          >
-            <Download className="h-4 w-4" /> Export CSV
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadXlsx(category || undefined)}
+            >
+              <FileSpreadsheet className="h-4 w-4" /> Excel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadReport(category || undefined)}
+            >
+              <FileText className="h-4 w-4" /> PDF report
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => downloadCsv(category || undefined)}
+            >
+              <Download className="h-4 w-4" /> CSV
+            </Button>
+          </div>
         )}
       </header>
 
