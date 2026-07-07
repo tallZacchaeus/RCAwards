@@ -13,7 +13,7 @@ Development of the Redemption City Awards of Excellence platform is complete —
 the site covering nominations, public voting, judging, and this year's award
 categories is ready for launch at **awards.thecitybreed.org**.
 
-To take it live for the 2026 edition (Wednesday, 29 July 2026), I am requesting
+To take it live for the 2026 edition (Tuesday, 28 July 2026), I am requesting
 approval for the hosting budget below.
 
 **One-time setup (covers 2 full years of hosting)**

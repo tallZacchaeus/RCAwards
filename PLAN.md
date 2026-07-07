@@ -1,6 +1,6 @@
 # Redemption City Award of Excellence 2026 — Build Plan
 
-_Powered by City Breed · 4th Edition · Event: Wednesday, 29 July 2026_
+_Powered by City Breed · 4th Edition · Event: Tuesday, 28 July 2026_
 
 ## 1. What we're building
 
@@ -121,7 +121,7 @@ Each is seeded as a JSON form definition extracted from `2026 Content For Award 
 - Auth (admin/judge); admin nomination listing + status; scoring; exports.
 
 **Phase 3 — Marketing site (merged design + motion)**
-- Build the narrative-scroll page: Hero, B.R.E.E.D. pillars, About the Award, Objectives, How-to-Nominate steps, Categories showcase, Past Winners gallery, Countdown to 29 July 2026, Sponsors, FAQ, newsletter signup, footer.
+- Build the narrative-scroll page: Hero, B.R.E.E.D. pillars, About the Award, Objectives, How-to-Nominate steps, Categories showcase, Past Winners gallery, Countdown to 28 July 2026, Sponsors, FAQ, newsletter signup, footer.
 - Generate hero / category / spotlight sections with **21st Magic MCP**, then hand-tune to the brand.
 - Layer **GSAP ScrollTrigger** beats (pinned sections, staggered reveals, parallax, count-up countdown) + **Lenis** smooth scroll. Keep to the Phase-0 motion principles.
 - **Performance pass against the §3a budget** before moving on (Lighthouse ≥ 90 mobile, LCP < 2.0s, CLS ~0).
@@ -142,7 +142,7 @@ Each is seeded as a JSON form definition extracted from `2026 Content For Award 
 ## 8. Open items to confirm as we go
 
 - **Voting model:** one vote per category per device, or weighted/limited? Public tallies visible live or revealed at close?
-- **Nomination vs voting windows:** exact open/close dates around the 29 July event.
+- **Nomination vs voting windows:** exact open/close dates around the 28 July event.
 - **Auth for judges:** invite-only accounts vs SSO.
 - **Storage/hosting** provider choices (finalize at Phase 7).
 - **Captcha** provider (hCaptcha/Turnstile) for nominations + votes.

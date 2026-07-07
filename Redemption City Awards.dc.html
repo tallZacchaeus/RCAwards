@@ -85,7 +85,7 @@ image-slot{display:block;background:linear-gradient(135deg,#1d1107,#241608);bord
     <div style="position:relative;z-index:2;text-align:center;max-width:1120px">
       <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:34px;animation:fadeUp 1s both .2s">
         <span style="width:34px;height:1px;background:linear-gradient(90deg,transparent,#C9A24B)"></span>
-        <span style="font-size:12.5px;letter-spacing:.42em;text-transform:uppercase;color:#C9A24B;font-weight:600">The 4th Annual Ceremony · 29 July 2026</span>
+        <span style="font-size:12.5px;letter-spacing:.42em;text-transform:uppercase;color:#C9A24B;font-weight:600">The 4th Annual Ceremony · 28 July 2026</span>
         <span style="width:34px;height:1px;background:linear-gradient(90deg,#C9A24B,transparent)"></span>
       </div>
       <h1 style="font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(2.7rem,7.4vw,7rem);line-height:1.02;letter-spacing:-.015em;color:#F5EFE3">
@@ -111,7 +111,7 @@ image-slot{display:block;background:linear-gradient(135deg,#1d1107,#241608);bord
     <div style="position:absolute;left:50%;top:50%;width:min(440px,60vw);height:min(440px,60vw);background:radial-gradient(circle,rgba(248,231,161,.14),transparent 64%);filter:blur(14px);animation:glowPulse 6s ease-in-out infinite;pointer-events:none"></div>
     <div style="position:relative;z-index:2;text-align:center;max-width:980px;margin:0 auto">
       <div style="font-size:12.5px;letter-spacing:.42em;text-transform:uppercase;color:#C9A24B;font-weight:600;margin-bottom:16px;animation:revealUp .9s both;animation-timeline:view();animation-range:entry 0% cover 26%">Next Redemption City Awards</div>
-      <h2 style="font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(2rem,4.2vw,3.4rem);color:#F5EFE3;margin-bottom:54px;animation:revealUp .9s both;animation-timeline:view();animation-range:entry 4% cover 30%">Wednesday, 29 July 2026</h2>
+      <h2 style="font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(2rem,4.2vw,3.4rem);color:#F5EFE3;margin-bottom:54px;animation:revealUp .9s both;animation-timeline:view();animation-range:entry 4% cover 30%">Tuesday, 28 July 2026</h2>
       <div style="display:flex;justify-content:center;gap:clamp(10px,2.4vw,30px);flex-wrap:wrap;animation:revealScale 1s both;animation-timeline:view();animation-range:entry 6% cover 34%">
         <div style="min-width:clamp(74px,15vw,150px);padding:26px 14px;background:rgba(255,255,255,.025);border:1px solid rgba(201,162,75,.18);border-radius:4px;backdrop-filter:blur(8px)"><div ref="{{ dRef }}" style="font-family:'Playfair Display',serif;font-size:clamp(38px,7vw,76px);font-weight:600;line-height:1;background:linear-gradient(160deg,#F8E7A1,#C9A24B);-webkit-background-clip:text;background-clip:text;color:transparent">00</div><div style="font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:rgba(245,239,227,.55);margin-top:14px">Days</div></div>
         <div style="min-width:clamp(74px,15vw,150px);padding:26px 14px;background:rgba(255,255,255,.025);border:1px solid rgba(201,162,75,.18);border-radius:4px;backdrop-filter:blur(8px)"><div ref="{{ hRef }}" style="font-family:'Playfair Display',serif;font-size:clamp(38px,7vw,76px);font-weight:600;line-height:1;background:linear-gradient(160deg,#F8E7A1,#C9A24B);-webkit-background-clip:text;background-clip:text;color:transparent">00</div><div style="font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:rgba(245,239,227,.55);margin-top:14px">Hours</div></div>
@@ -437,7 +437,7 @@ class Component extends DCLogic {
     this.subMsgRef = (el) => { this._subMsg = el; };
     this.subRef = () => {};
     this._raf = 0;
-    this._target = new Date('2026-07-29T19:00:00').getTime();
+    this._target = new Date('2026-07-28T19:00:00').getTime();
   }
 
   componentDidMount() {
@@ -606,7 +606,7 @@ class Component extends DCLogic {
       { date: '01 March 2026', title: 'Nominations Open', desc: 'The public submits nominees across all ten categories. Every voice counts.' },
       { date: '15 April 2026', title: 'Voting Begins', desc: 'Shortlisted nominees go live for community voting, weighted alongside the jury.' },
       { date: '10 June 2026', title: 'Finalists Announced', desc: 'The official finalists are revealed across our channels and the city anticipates.' },
-      { date: '29 July 2026', title: 'Awards Night', desc: 'The gala — a black-tie celebration where winners are crowned before the city.' },
+      { date: '28 July 2026', title: 'Awards Night', desc: 'The gala — a black-tie celebration where winners are crowned before the city.' },
       { date: '07 August 2026', title: 'Hall of Fame Update', desc: 'New honourees join the permanent record of excellence in Redemption City.' },
     ];
 

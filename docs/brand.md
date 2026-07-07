@@ -45,7 +45,7 @@ Roles matched to the flyer's lettering. All available on Google Fonts.
 | Role | Font | Where |
 |---|---|---|
 | **Display caps** | **Cinzel** (Trajan-style Roman capitals) | The "AWARDS OF EXCELLENCE" wordmark, hero title, all-caps section eyebrows |
-| **Editorial serif** | **Playfair Display** (high-contrast Didone) | Large headlines, the date lockup ("29TH JULY, 2026" style), elegant pull quotes |
+| **Editorial serif** | **Playfair Display** (high-contrast Didone) | Large headlines, the date lockup ("28TH JULY, 2026" style), elegant pull quotes |
 | **Accent serif** | **Cormorant Garamond** | Refined subheads, intros, quotes |
 | **Body / UI** | **Manrope** | Paragraphs, buttons, forms, nav, the admin dashboard |
 
@@ -100,5 +100,5 @@ import { Cinzel, Playfair_Display, Cormorant_Garamond, Manrope } from 'next/font
 
 - Name: **The Redemption City Awards of Excellence**
 - Edition: **4th** (2026)
-- Date: **Wednesday, 29 July 2026**
+- Date: **Tuesday, 28 July 2026**
 - Powered by **City Breed** · social: **@thecitybreed** (FB / IG / X / YouTube)
