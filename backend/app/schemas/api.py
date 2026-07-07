@@ -215,3 +215,49 @@ class SettingsUpdate(BaseModel):
     voting_opens_at: Optional[str] = None
     voting_closes_at: Optional[str] = None
     voting_results_public: Optional[bool] = None
+
+
+# --- Nomination analytics -----------------------------------------------------
+
+class StatusBreakdown(BaseModel):
+    submitted: int = 0
+    shortlisted: int = 0
+    rejected: int = 0
+
+
+class CategoryStat(BaseModel):
+    slug: str
+    name: str
+    group: str
+    count: int
+    submitted: int
+    shortlisted: int
+    rejected: int
+
+
+class GroupStat(BaseModel):
+    group: str
+    count: int
+
+
+class TimelinePoint(BaseModel):
+    date: str  # YYYY-MM-DD
+    count: int
+
+
+class NominationAnalytics(BaseModel):
+    generated_at: str
+    scope: str  # "all" or a category slug
+    total: int
+    categories_total: int
+    categories_with_entries: int
+    categories_empty: int
+    unique_nominators: int
+    with_evidence: int
+    last_24h: int
+    last_7d: int
+    status: StatusBreakdown
+    by_category: list[CategoryStat]
+    empty_categories: list[str]
+    by_group: list[GroupStat]
+    timeline: list[TimelinePoint]

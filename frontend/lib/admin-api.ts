@@ -109,6 +109,34 @@ export type NomineeOut = {
   is_winner: boolean;
 };
 
+export type CategoryStat = {
+  slug: string;
+  name: string;
+  group: string;
+  count: number;
+  submitted: number;
+  shortlisted: number;
+  rejected: number;
+};
+
+export type NominationAnalytics = {
+  generated_at: string;
+  scope: string;
+  total: number;
+  categories_total: number;
+  categories_with_entries: number;
+  categories_empty: number;
+  unique_nominators: number;
+  with_evidence: number;
+  last_24h: number;
+  last_7d: number;
+  status: { submitted: number; shortlisted: number; rejected: number };
+  by_category: CategoryStat[];
+  empty_categories: string[];
+  by_group: { group: string; count: number }[];
+  timeline: { date: string; count: number }[];
+};
+
 // --- Endpoints ----------------------------------------------------------------
 
 export async function listNominations(params: {
@@ -234,5 +262,31 @@ export async function downloadJudgingSheet(slug: string): Promise<void> {
   await downloadBlob(
     await adminFetch(`/admin/categories/${slug}/judging-sheet.csv`),
     `judging-sheet-${slug}.csv`
+  );
+}
+
+/** Aggregate nomination stats for the analytics dashboard (all or one category). */
+export async function getNominationAnalytics(
+  category?: string
+): Promise<NominationAnalytics> {
+  const q = category ? `?category=${encodeURIComponent(category)}` : "";
+  return json(await adminFetch(`/admin/analytics/nominations${q}`));
+}
+
+/** Full responses as an Excel workbook (Summary + one sheet per category). */
+export async function downloadXlsx(category?: string): Promise<void> {
+  const q = category ? `?category=${encodeURIComponent(category)}` : "";
+  await downloadBlob(
+    await adminFetch(`/admin/nominations/export/xlsx${q}`),
+    `nominations-${category || "all"}.xlsx`
+  );
+}
+
+/** Branded PDF summary report of nominations. */
+export async function downloadReport(category?: string): Promise<void> {
+  const q = category ? `?category=${encodeURIComponent(category)}` : "";
+  await downloadBlob(
+    await adminFetch(`/admin/reports/nominations.pdf${q}`),
+    `nominations-report-${category || "all"}.pdf`
   );
 }

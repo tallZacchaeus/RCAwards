@@ -23,6 +23,8 @@ from ..models import (
     UserRole,
     Vote,
 )
+from ..analytics import compute_nomination_analytics
+from ..exports import build_nominations_pdf, build_nominations_xlsx
 from ..judging import judging_criteria, score_nominee
 from ..schemas.api import (
     CategoryFlags,
@@ -31,6 +33,7 @@ from ..schemas.api import (
     CriterionOut,
     FileRef,
     LeaderboardEntry,
+    NominationAnalytics,
     NominationDetail,
     NominationListItem,
     NomineeCreate,
@@ -386,6 +389,59 @@ def export_csv(
     return StreamingResponse(
         iter([buffer.getvalue()]),
         media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
+# --- Analytics + rich exports (admin only) ------------------------------------
+
+_XLSX_MEDIA = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+@router.get("/analytics/nominations", response_model=NominationAnalytics)
+def nomination_analytics(
+    category: str | None = Query(None, description="Scope to one category slug"),
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> NominationAnalytics:
+    """Aggregate nomination stats for the admin dashboard (all or one category)."""
+    if category:
+        _category_or_404(session, category)
+    return NominationAnalytics(**compute_nomination_analytics(session, category))
+
+
+@router.get("/nominations/export/xlsx")
+def export_xlsx(
+    category: str | None = Query(None, description="Filter by category slug"),
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> Response:
+    """Full responses as an Excel workbook: a Summary sheet + one sheet per category."""
+    if category:
+        _category_or_404(session, category)
+    data = build_nominations_xlsx(session, category)
+    filename = f"nominations-{category or 'all'}.xlsx"
+    return Response(
+        content=data,
+        media_type=_XLSX_MEDIA,
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
+@router.get("/reports/nominations.pdf")
+def export_pdf(
+    category: str | None = Query(None, description="Filter by category slug"),
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> Response:
+    """A branded PDF summary report of nominations (all or one category)."""
+    if category:
+        _category_or_404(session, category)
+    data = build_nominations_pdf(session, category)
+    filename = f"nominations-report-{category or 'all'}.pdf"
+    return Response(
+        content=data,
+        media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
 
