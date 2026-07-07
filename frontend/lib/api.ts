@@ -11,6 +11,20 @@ import type {
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 
+// Server-side renders (marketing pages, generateMetadata, sitemap) run *inside*
+// the frontend container. There, the public API_BASE (e.g.
+// https://awards.thecitybreed.org/api) has to hairpin back out through the public
+// domain to reach the backend — which fails on most single-host Docker/VPS setups
+// (no NAT loopback), so the render silently falls back / 404s. For server calls we
+// prefer an internal base that reaches the backend directly over the compose
+// network (API_INTERNAL_BASE=http://backend:8000), falling back to the public base
+// when it isn't set (local dev, where localhost is reachable). In the browser we
+// always use the public base — client code can't resolve the internal hostname.
+const SERVER_API_BASE =
+  typeof window === "undefined"
+    ? process.env.API_INTERNAL_BASE || API_BASE
+    : API_BASE;
+
 // Cap how long a server render waits on the API. Without this, an up-but-slow
 // backend (cold DB, launch-night load) hangs the whole page's TTFB. The callers
 // below already fall back gracefully when the fetch throws (incl. on timeout).
@@ -20,7 +34,7 @@ const FETCH_TIMEOUT_MS = 3500;
  *  when the API is unreachable (e.g. at build time or offline). */
 export async function getCategories(): Promise<CategorySummary[]> {
   try {
-    const res = await fetch(`${API_BASE}/categories`, {
+    const res = await fetch(`${SERVER_API_BASE}/categories`, {
       next: { revalidate: 300 },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
@@ -46,7 +60,7 @@ export async function subscribe(email: string, website = ""): Promise<boolean> {
 /** Fetch one category's full form definition. Returns null if unreachable. */
 export async function getCategory(slug: string): Promise<CategoryDetail | null> {
   try {
-    const res = await fetch(`${API_BASE}/categories/${slug}`, {
+    const res = await fetch(`${SERVER_API_BASE}/categories/${slug}`, {
       next: { revalidate: 300 },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
@@ -70,7 +84,7 @@ export async function uploadFile(file: File): Promise<{ url: string }> {
 
 export async function getVotingStatus(): Promise<VotingStatus> {
   try {
-    const res = await fetch(`${API_BASE}/voting/status`, {
+    const res = await fetch(`${SERVER_API_BASE}/voting/status`, {
       next: { revalidate: 60 },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
@@ -83,7 +97,7 @@ export async function getVotingStatus(): Promise<VotingStatus> {
 
 export async function getNominees(categorySlug: string): Promise<Nominee[]> {
   try {
-    const res = await fetch(`${API_BASE}/nominees?category=${categorySlug}`, {
+    const res = await fetch(`${SERVER_API_BASE}/nominees?category=${categorySlug}`, {
       next: { revalidate: 30 },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
