@@ -57,6 +57,13 @@ services:
         # Baked into the client bundle — the public URL the browser calls.
         NEXT_PUBLIC_API_BASE: https://${SITE_DOMAIN}/api
         NEXT_PUBLIC_SITE_URL: https://${SITE_DOMAIN}
+    # Runtime env: server-side renders (SSR/generateMetadata) call the backend
+    # directly over the compose network. The public URL above can't be reached
+    # from inside this container (no NAT hairpin back through the domain), which
+    # is why category pages 404'd. The backend serves routes at the root here —
+    # Caddy strips /api on the public path, so internally it's just /categories.
+    environment:
+      API_INTERNAL_BASE: http://backend:8000
     restart: unless-stopped
     depends_on:
       backend:
