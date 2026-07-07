@@ -8,10 +8,10 @@ export const EVENT = {
   tagline: "Excellence in motion. Greatness within reach.",
   poweredBy: "City Breed",
   social: "@thecitybreed",
-  // Wednesday, 29 July 2026, 7pm WAT — from the official flyer. The +01:00 offset
+  // Tuesday, 28 July 2026, 7pm WAT — from the official flyer. The +01:00 offset
   // makes the countdown target an absolute instant, not each visitor's local 7pm.
-  dateISO: "2026-07-29T19:00:00+01:00",
-  dateLabel: "Wednesday, 29 July 2026",
+  dateISO: "2026-07-28T19:00:00+01:00",
+  dateLabel: "Tuesday, 28 July 2026",
   nominateUrl: "/nominate",
 };
 

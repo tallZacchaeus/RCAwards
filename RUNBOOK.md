@@ -1,6 +1,6 @@
 # Launch-Night Runbook — Redemption City Awards 2026
 
-Operational guide for **event night (29 July 2026)** and the days around it.
+Operational guide for **event night (28 July 2026)** and the days around it.
 Deployment details are in [`DEPLOY.md`](DEPLOY.md); this doc covers running it live.
 
 ---

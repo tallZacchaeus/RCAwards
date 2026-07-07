@@ -1,7 +1,7 @@
 # Redemption City Award of Excellence 2026
 
 Web platform for the **Redemption City Award of Excellence**, 4th Edition —
-_powered by City Breed_. Event: **Wednesday, 29 July 2026**.
+_powered by City Breed_. Event: **Tuesday, 28 July 2026**.
 
 The platform has three faces: a marketing site, native nomination forms for 23
 award categories, and public voting plus an admin/judging dashboard. See
