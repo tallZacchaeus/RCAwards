@@ -45,7 +45,7 @@ lib/
 ## Nomination flow (Phase 4)
 
 `/nominate` lists categories; `/nominate/[slug]` fetches that category's form
-definition from the backend and renders it dynamically — any of the 23 forms from
+definition from the backend and renders it dynamically — any of the 20 forms from
 JSON, no hardcoding. Client-side validation mirrors the backend validator for
 instant feedback; the backend re-validates on submit. File fields upload to
 `/uploads` first, then their URLs ride along with the nomination to

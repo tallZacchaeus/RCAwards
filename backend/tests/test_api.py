@@ -10,7 +10,7 @@ def test_health(client):
 
 def test_list_and_get_categories(client):
     cats = client.get("/categories").json()
-    assert len(cats) == 23
+    assert len(cats) == 20
     detail = client.get("/categories/creche-of-the-year").json()
     assert detail["form"]["slug"] == "creche-of-the-year"
     assert detail["form"]["sections"]

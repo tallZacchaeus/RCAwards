@@ -3,7 +3,7 @@ import { Reveal } from "./reveal";
 import { CountUp } from "./count-up";
 
 const STATS: { value: string; label: string; count?: number }[] = [
-  { value: "23", label: "Categories", count: 23 },
+  { value: "20", label: "Categories", count: 20 },
   { value: String(JURY.length), label: "Jurors", count: JURY.length },
   { value: "4th", label: "Edition" },
   { value: "2026", label: "The Night" },

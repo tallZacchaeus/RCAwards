@@ -31,18 +31,18 @@ tests/                 # validator + seed-integrity tests
 
 ## The form-schema engine
 
-The 23 award categories have very different forms, so forms are **data, not code**.
+The 20 award categories have very different forms, so forms are **data, not code**.
 A category is a `FormDefinition`: `sections[] → fields[]`, where each field has a
 `type` (`short_text`, `paragraph`, `email`, `phone`, `multiple_choice`, `dropdown`,
 `yes_no`, `linear_scale_1_10`, `file_upload`, `region_select`). The frontend renders
 any form from this JSON; `validation.py` enforces the same rules server-side.
 
 The **Departmental Impact** awards are generated from `seed/departments.json` so all
-8 departments share one uniform form and the five fixed criteria (Leadership,
+6 departments share one uniform form and the five fixed criteria (Leadership,
 Integrity, Problem Solving, Collaboration & Team Spirit, Impact & Value) — per the
 PFO directive in the source brief.
 
-Categories: **8 city · 4 regional · 8 departmental · 3 SATGO = 23**.
+Categories: **7 city · 4 regional · 6 departmental · 3 SATGO = 20**.
 
 ## Setup
 

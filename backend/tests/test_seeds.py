@@ -5,7 +5,11 @@ from app.seed.loader import load_all_definitions
 
 def test_all_seeds_load_and_validate():
     forms = load_all_definitions()
-    assert len(forms) == 23
+    assert len(forms) == 20
+    by_group = {}
+    for form in forms:
+        by_group[form.group.value] = by_group.get(form.group.value, 0) + 1
+    assert by_group == {"city": 7, "regional": 4, "satgo": 3, "departmental": 6}
 
 
 def test_slugs_are_unique():
@@ -30,7 +34,15 @@ def test_choice_fields_have_options():
 def test_departmental_forms_are_uniform():
     """The PFO directive: every departmental award shares the same 5 criteria."""
     forms = [f for f in load_all_definitions() if f.group.value == "departmental"]
-    assert len(forms) == 8
+    assert len(forms) == 6
+    assert {f.slug for f in forms} == {
+        "departmental-rhv",
+        "departmental-security",
+        "departmental-transport",
+        "departmental-hospitality",
+        "departmental-electronics",
+        "departmental-it",
+    }
     expected = {"leadership", "integrity", "problem_solving", "collaboration", "impact_value"}
     signatures = set()
     for form in forms:
