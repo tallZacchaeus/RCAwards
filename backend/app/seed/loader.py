@@ -42,26 +42,29 @@ def _departmental_definitions() -> list[FormDefinition]:
                     "voting_enabled": data["voting_enabled"],
                     "description": (
                         f"Nominate an outstanding individual in the {name} who has "
-                        "demonstrated excellence in their role. Nominations are judged "
-                        "uniformly on five values: Leadership, Integrity, Problem "
-                        "Solving, Collaboration & Team Spirit, and Impact & Value to "
-                        "the Department. The top 3 nominees per department are reviewed "
-                        "by the judging committee."
+                        "consistently demonstrated excellence, exceptional character, "
+                        "professionalism, and positive impact over the last year. "
+                        "Nominations are judged uniformly on five values: Leadership, "
+                        "Integrity, Problem Solving, Collaboration & Team Spirit, and "
+                        "Impact & Value to the Department. The top 3 nominees per "
+                        "department are reviewed by the judging committee."
                     ),
                     "sections": [
                         {
-                            "title": "Nominator's Details",
+                            "title": "Your Information",
                             "fields": [
-                                {"key": "nominator_email", "label": "Your Valid Email Address", "type": "email", "required": True},
-                                {"key": "nominator_position", "label": "Your Position (if applicable)", "type": "short_text", "required": False},
-                                {"key": "resides_in_city", "label": "Do you reside in Redemption City or are you affiliated with an RCCG Region?", "type": "yes_no", "required": True},
+                                {"key": "nominator_email", "label": "Email", "type": "email", "required": True},
+                                {"key": "nominator_full_name", "label": "Full Name", "type": "short_text", "required": True},
+                                {"key": "nominator_position", "label": "Your Position", "type": "short_text", "required": True},
+                                {"key": "nominator_phone", "label": "Phone Number", "type": "phone", "required": True},
                             ],
                         },
                         {
                             "title": "Nominee Information",
+                            "description": "Information about the person you are nominating.",
                             "fields": [
                                 {"key": "nominee_full_name", "label": "Full Name of the Nominee", "type": "short_text", "required": True},
-                                {"key": "nominee_role", "label": "Role/Position of the Nominee", "type": "short_text", "required": False},
+                                {"key": "nominee_role", "label": "Nominee's Role/Position", "type": "short_text", "required": False},
                             ],
                         },
                         {
@@ -75,7 +78,7 @@ def _departmental_definitions() -> list[FormDefinition]:
                         {
                             "title": "Supporting Comments",
                             "fields": [
-                                {"key": "why_nominate", "label": "Why are you nominating this person? Share a specific example of your experience with them.", "type": "paragraph", "required": True},
+                                {"key": "why_nominate", "label": "Why do you believe this person deserves the award? Share an experience with them, if possible.", "type": "paragraph", "required": True},
                                 {"key": "supporting_file", "label": "Optional: upload a commendation letter, photo, or testimonial", "type": "file_upload", "required": False, "accept": ["image/*", "application/pdf"]},
                             ],
                         },
@@ -107,6 +110,8 @@ def seed_database() -> int:
     from ..models import Category, CategoryGroup
 
     forms = load_all_definitions()
+    active_slugs = {form.slug for form in forms}
+    edition_years = {form.edition_year for form in forms}
     session = SessionLocal()
     try:
         for form in forms:
@@ -126,6 +131,15 @@ def seed_database() -> int:
                     setattr(existing, key, value)
             else:
                 session.add(Category(slug=form.slug, **payload))
+        stale = (
+            session.query(Category)
+            .filter(Category.edition_year.in_(edition_years), Category.slug.notin_(active_slugs))
+            .all()
+        )
+        for category in stale:
+            category.active = False
+            category.nominations_open = False
+            category.voting_enabled = False
         session.commit()
         return len(forms)
     finally:

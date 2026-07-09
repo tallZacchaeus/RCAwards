@@ -3,7 +3,7 @@
 Web platform for the **Redemption City Award of Excellence**, 4th Edition —
 _powered by City Breed_. Event: **Tuesday, 28 July 2026**.
 
-The platform has three faces: a marketing site, native nomination forms for 23
+The platform has three faces: a marketing site, native nomination forms for 20
 award categories, and public voting plus an admin/judging dashboard. See
 [`PLAN.md`](PLAN.md) for the full build plan and architecture.
 
@@ -40,7 +40,7 @@ PLAN.md     full plan, phases, and design/motion system
 cd backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python -m app.seed.loader --check   # validates the 23 category definitions
+python -m app.seed.loader --check   # validates the 20 category definitions
 ```
 
 See [`backend/README.md`](backend/README.md) for migrations, seeding, and running the API.

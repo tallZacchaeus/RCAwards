@@ -81,7 +81,7 @@ Field types to support: `short_text`, `paragraph`, `multiple_choice`, `dropdown`
 
 - **City-based:** Crèche of the Year · Event of the Year · Inspirational Leader (Male & Female) · Business Owner of the Year · Organisation of the Year · Under-30 Impact Person · CSR Organisation of the Year
 - **RCCG Regional:** Agricultural Innovation · Sports Development · Youth Development · Tech Development
-- **Departmental Impact (uniform 5 criteria):** Sanitation · Water · Health (RHV) · Environmental Health · Maintenance · Electronics · Transport · Security · Primary/Secondary School
+- **Departmental Impact (uniform 5 criteria):** RHV · Security · Transport · Hospitality · Electronics · IT
 - **SATGO Youth Province:** Evangelism Impact · Fastest Growing · Outstanding Youth Province
 
 Each is seeded as a JSON form definition extracted from `2026 Content For Award 4.0 link.docx`.
