@@ -1,4 +1,6 @@
 """End-to-end API tests for the Phase 2 endpoints."""
+from sqlalchemy import func, select
+
 from tests.conftest import valid_creche_payload
 
 
@@ -196,3 +198,89 @@ def test_admin_creates_judge_user(client, admin_headers):
         "/auth/login", data={"username": "newjudge@example.com", "password": "secretpass1"}
     )
     assert login.status_code == 200
+
+
+def test_ticket_availability_and_booking(client):
+    availability = client.get("/tickets/availability").json()
+    assert availability["available"] is True
+    assert availability["remaining"] == 305
+
+    resp = client.post(
+        "/tickets",
+        json={
+            "first_name": "Ada",
+            "last_name": "Nwosu",
+            "email": "ada.nwosu@example.com",
+            "location": "Redemption City",
+            "website": "",
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    created = resp.json()
+    assert created["ticket_number"] == "RCAE-001"
+    assert created["email"] == "ada.nwosu@example.com"
+
+    availability = client.get("/tickets/availability").json()
+    assert availability["remaining"] == 304
+
+
+def test_ticket_sold_out(client):
+    # Fill all remaining tickets then verify the booking flow rejects the next reservation.
+    from app.db import SessionLocal
+    from app.models import Ticket
+    from sqlalchemy import delete
+
+    session = SessionLocal()
+    start_count = 0
+    added_ticket_numbers = []
+    try:
+        start_count = int(session.scalar(select(func.count(Ticket.id))) or 0)
+        for index in range(start_count + 1, 306):
+            ticket_number = f"RCAE-{index:03d}"
+            session.add(
+                Ticket(
+                    ticket_number=ticket_number,
+                    first_name="Test",
+                    last_name="Buyer",
+                    email=f"test{index}@example.com",
+                    location="Redemption City",
+                )
+            )
+            added_ticket_numbers.append(ticket_number)
+        session.commit()
+
+        resp = client.post(
+            "/tickets",
+            json={
+                "first_name": "Late",
+                "last_name": "Guest",
+                "email": "late.guest@example.com",
+                "location": "Redemption City",
+                "website": "",
+            },
+        )
+        assert resp.status_code == 409
+        assert "sold out" in resp.json()["detail"].lower()
+    finally:
+        if added_ticket_numbers:
+            session.execute(
+                delete(Ticket).where(Ticket.ticket_number.in_(added_ticket_numbers))
+            )
+            session.commit()
+        session.close()
+
+
+def test_admin_lists_tickets(client, admin_headers):
+    created = client.post(
+        "/tickets",
+        json={
+            "first_name": "Kemi",
+            "last_name": "Adewale",
+            "email": "kemi.adewale@example.com",
+            "location": "Redemption City",
+            "website": "",
+        },
+    ).json()
+
+    tickets = client.get("/admin/tickets", headers=admin_headers).json()
+    assert any(ticket["ticket_number"] == created["ticket_number"] for ticket in tickets)

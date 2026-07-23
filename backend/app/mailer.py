@@ -24,8 +24,15 @@ def is_configured() -> bool:
     return bool(s.smtp_host and s.smtp_user and s.smtp_password)
 
 
-def send_email(to: str, subject: str, body: str, *, html: str | None = None) -> None:
-    """Send a plain-text email (optionally with an HTML alternative).
+def send_email(
+    to: str,
+    subject: str,
+    body: str,
+    *,
+    html: str | None = None,
+    attachments: list[tuple[str, bytes, str]] | None = None,
+) -> None:
+    """Send a plain-text email (optionally with HTML and attachments).
 
     Raises RuntimeError when SMTP is unconfigured and smtplib exceptions on
     delivery failure — callers decide whether that is fatal for their flow.
@@ -41,6 +48,11 @@ def send_email(to: str, subject: str, body: str, *, html: str | None = None) -> 
     msg.set_content(body)
     if html is not None:
         msg.add_alternative(html, subtype="html")
+
+    if attachments:
+        for filename, data, content_type in attachments:
+            maintype, subtype = content_type.split("/", 1)
+            msg.add_attachment(data, maintype=maintype, subtype=subtype, filename=filename)
 
     with smtplib.SMTP_SSL(s.smtp_host, s.smtp_port, timeout=20) as smtp:
         smtp.login(s.smtp_user, s.smtp_password)

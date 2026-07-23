@@ -153,6 +153,52 @@ export type SubmitResult =
   | { ok: true; id: number }
   | { ok: false; fieldErrors: FieldErrors; message?: string };
 
+export type TicketAvailability = {
+  available: boolean;
+  remaining: number;
+  total: number;
+};
+
+export type TicketCreatePayload = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  location: string;
+  website?: string;
+};
+
+export type TicketCreated = {
+  id: number;
+  ticket_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  location: string;
+  created_at: string;
+};
+
+export async function getTicketAvailability(): Promise<TicketAvailability> {
+  const res = await fetch(`${API_BASE}/tickets/availability`);
+  if (!res.ok) throw new Error("Could not load ticket availability");
+  return (await res.json()) as TicketAvailability;
+}
+
+export async function bookTicket(
+  payload: TicketCreatePayload,
+): Promise<TicketCreated> {
+  const res = await fetch(`${API_BASE}/tickets`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const detail = await res.json().catch(() => null);
+    const message = typeof detail?.detail === "string" ? detail.detail : "Could not complete booking.";
+    throw new Error(message);
+  }
+  return (await res.json()) as TicketCreated;
+}
+
 export async function submitNomination(
   categorySlug: string,
   answers: Answers,

@@ -195,3 +195,19 @@ class Subscriber(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(200), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class Ticket(Base):
+    """A public open-ticket booking for the awards ceremony."""
+
+    __tablename__ = "tickets"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ticket_number: Mapped[str] = mapped_column(String(12), unique=True, index=True)
+    ticket_type: Mapped[str] = mapped_column(String(120), default="Open Ticket (Pearl)")
+    first_name: Mapped[str] = mapped_column(String(120))
+    last_name: Mapped[str] = mapped_column(String(120))
+    email: Mapped[str] = mapped_column(String(200), index=True)
+    location: Mapped[str] = mapped_column(String(200))
+    email_sent: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

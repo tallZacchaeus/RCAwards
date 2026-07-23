@@ -17,7 +17,7 @@ from sqlalchemy import text
 
 from .config import get_settings
 from .db import get_engine
-from .routers import admin, auth, nominations, public, voting
+from .routers import admin, auth, nominations, public, tickets, voting
 
 logging.basicConfig(
     level=logging.INFO,
@@ -88,6 +88,7 @@ app.include_router(public.router)
 app.include_router(nominations.router)
 app.include_router(voting.router)
 app.include_router(auth.router)
+app.include_router(tickets.router)
 app.include_router(admin.router)
 
 # Serve locally-stored uploads in development. In production these live behind a

@@ -109,6 +109,18 @@ export type NomineeOut = {
   is_winner: boolean;
 };
 
+export type TicketOut = {
+  id: number;
+  ticket_number: string;
+  ticket_type: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  location: string;
+  email_sent: boolean;
+  created_at: string;
+};
+
 export type CategoryStat = {
   slug: string;
   name: string;
@@ -236,6 +248,10 @@ export async function updateSettings(
   return json(
     await adminFetch(`/admin/settings`, { method: "PUT", body: JSON.stringify(payload) })
   );
+}
+
+export async function listTickets(): Promise<TicketOut[]> {
+  return json(await adminFetch(`/admin/tickets`));
 }
 
 async function downloadBlob(res: Response, filename: string): Promise<void> {
