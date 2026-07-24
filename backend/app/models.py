@@ -21,6 +21,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -210,4 +211,6 @@ class Ticket(Base):
     email: Mapped[str] = mapped_column(String(200), index=True)
     location: Mapped[str] = mapped_column(String(200))
     email_sent: Mapped[bool] = mapped_column(Boolean, default=False)
+    checked_in: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("0"))
+    checked_in_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

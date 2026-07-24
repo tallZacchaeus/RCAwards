@@ -175,7 +175,14 @@ export type TicketCreated = {
   email: string;
   location: string;
   created_at: string;
+  token: string;
 };
+
+/** Build the authorised download URL for a booked ticket's PDF. The token is
+ *  issued by the backend at booking time and gates the download. */
+export function ticketPdfUrl(ticketNumber: string, token: string): string {
+  return `${API_BASE}/tickets/${encodeURIComponent(ticketNumber)}/pdf?token=${encodeURIComponent(token)}`;
+}
 
 export async function getTicketAvailability(): Promise<TicketAvailability> {
   const res = await fetch(`${API_BASE}/tickets/availability`);

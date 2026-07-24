@@ -86,6 +86,8 @@ class TicketCreated(BaseModel):
     email: EmailStr
     location: str
     created_at: datetime
+    # Signed token that authorises downloading this ticket's PDF without a login.
+    token: str
 
 
 class TicketOut(BaseModel):
@@ -97,9 +99,24 @@ class TicketOut(BaseModel):
     email: str
     location: str
     email_sent: bool
+    checked_in: bool
+    checked_in_at: datetime | None
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class TicketCheckInRequest(BaseModel):
+    # Present when checking in from a scanned QR; absent for manual name-search
+    # check-in by an authenticated admin. When present it must verify.
+    token: str | None = None
+
+
+class TicketCheckInResult(BaseModel):
+    ticket: TicketOut
+    # True when this call performed the check-in; False when the ticket was
+    # already checked in (the door staff should see a "already admitted" warning).
+    checked_in_now: bool
 
 
 # --- Auth ---------------------------------------------------------------------

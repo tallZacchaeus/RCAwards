@@ -77,6 +77,20 @@ Single VPS, 2 uvicorn workers, in-process rate limiter. Known limits:
 - Uploaded evidence lives in the `uploads` volume — snapshot the VPS or copy the volume.
 - Keep the post-nomination and post-voting dumps off-server (download them).
 
+## 5b. Tickets (free RSVP)
+
+- **Capacity** is set by `TICKET_CAPACITY` (default 305). Change it in the backend
+  environment to open or close seats — no code change or redeploy of images needed,
+  just restart the backend to pick up the new value. Availability and the "N tickets
+  remaining" copy update automatically.
+- **Confirmation email + PDF** requires SMTP to be configured (`SMTP_HOST`,
+  `SMTP_USER`, `SMTP_PASSWORD`; Hostinger: `smtp.hostinger.com`, port 465). If SMTP
+  is unset, bookings still succeed but **no email is sent** — the failure is logged,
+  not surfaced. The booker can always **download the PDF from the success screen**
+  (token-gated `GET /tickets/{number}/pdf`), so delivery never fully depends on email.
+- Verify email works before opening bookings: submit a test RSVP and confirm the PDF
+  arrives. Check backend logs for `Failed to send ticket email` if it doesn't.
+
 ## 6. After the event
 
 - Export final results: Admin → **Download judging sheet** (per category) and the

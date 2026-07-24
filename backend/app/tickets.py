@@ -5,18 +5,19 @@ import io
 import logging
 from typing import Any
 
+import qrcode
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from .config import get_settings
 from .db import SessionLocal
 from .mailer import send_email
 from .models import Ticket
+from .ticket_tokens import make_ticket_token
 
-TICKET_CAPACITY = 305
 DEFAULT_TICKET_TYPE = "PEARL"
 EVENT_TITLE = "The Redemption City Awards of Excellence"
 EVENT_DATE = "Tuesday, 28 July 2026"
@@ -31,6 +32,24 @@ def _style_paragraph(text: str, style: ParagraphStyle) -> Paragraph:
 
 def _cell(text: str, style: ParagraphStyle) -> Paragraph:
     return Paragraph(text, style)
+
+
+def check_in_payload(ticket: Ticket) -> str:
+    """The string encoded in a ticket's QR: `RCAE-001|<token>`. The admin
+    check-in scanner splits on `|` and posts both to the check-in endpoint,
+    which re-verifies the token so a forged number is rejected at the door."""
+    return f"{ticket.ticket_number}|{make_ticket_token(ticket.ticket_number)}"
+
+
+def _qr_flowable(data: str, size_mm: float) -> Image:
+    qr = qrcode.QRCode(border=1, error_correction=qrcode.constants.ERROR_CORRECT_M)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="#1F1B16", back_color="white")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    return Image(buffer, width=size_mm * mm, height=size_mm * mm)
 
 
 def build_ticket_pdf(ticket: Ticket) -> bytes:
@@ -156,6 +175,32 @@ def build_ticket_pdf(ticket: Ticket) -> bytes:
         textColor=colors.HexColor("#6B675F"),
     )
 
+    qr_caption = ParagraphStyle(
+        "ticket_qr_caption",
+        parent=styles["Normal"],
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor("#6B675F"),
+        alignment=1,
+    )
+    qr_block = Table(
+        [
+            [_qr_flowable(check_in_payload(ticket), 30)],
+            [Paragraph("Scan at entry", qr_caption)],
+        ],
+        colWidths=[40 * mm],
+        hAlign="CENTER",
+    )
+    qr_block.setStyle(
+        TableStyle(
+            [
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("TOPPADDING", (0, 1), (0, 1), 2),
+            ]
+        )
+    )
+
     footer = Paragraph(
         "Please present this ticket at the registration desk. This ticket is non-transferable.",
         small,
@@ -175,7 +220,9 @@ def build_ticket_pdf(ticket: Ticket) -> bytes:
             description,
             Spacer(1, 10 * mm),
             table,
-            Spacer(1, 14 * mm),
+            Spacer(1, 12 * mm),
+            qr_block,
+            Spacer(1, 12 * mm),
             footer,
             Spacer(1, 3 * mm),
             note,

@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     edition_year: int = 2026
     app_name: str = "Redemption City Awards API"
 
+    # Public ticket capacity for the awards ceremony. Change TICKET_CAPACITY in
+    # the environment to open or close seats without a code change or redeploy.
+    ticket_capacity: int = 305
+
     # Auth / JWT. CHANGE jwt_secret in every real environment.
     jwt_secret: str = "change-me-in-production"
     jwt_algorithm: str = "HS256"

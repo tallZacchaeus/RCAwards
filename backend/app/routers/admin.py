@@ -44,12 +44,17 @@ from ..schemas.api import (
     SettingsOut,
     SettingsUpdate,
     StatusUpdate,
+    TicketCheckInRequest,
+    TicketCheckInResult,
     TicketOut,
     UserCreate,
     UserOut,
     UserUpdate,
 )
+from ..mailer import is_configured as mailer_is_configured
 from ..security import hash_password, require_admin, require_staff
+from ..ticket_tokens import verify_ticket_token
+from ..tickets import send_ticket_email
 from ._helpers import summarize_submission
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -115,11 +120,99 @@ def get_nomination(
 
 @router.get("/tickets", response_model=list[TicketOut])
 def list_tickets(
+    q: str | None = Query(None, description="Search by name, email or ticket number"),
     session: Session = Depends(get_session),
     _: User = Depends(require_admin),
 ) -> list[TicketOut]:
-    tickets = session.scalars(select(Ticket).order_by(Ticket.created_at.desc())).all()
+    stmt = select(Ticket).order_by(Ticket.created_at.desc())
+    if q and q.strip():
+        term = f"%{q.strip().lower()}%"
+        stmt = stmt.where(
+            func.lower(Ticket.first_name).like(term)
+            | func.lower(Ticket.last_name).like(term)
+            | func.lower(Ticket.email).like(term)
+            | func.lower(Ticket.ticket_number).like(term)
+        )
+    tickets = session.scalars(stmt).all()
     return tickets
+
+
+@router.post("/tickets/{ticket_number}/check-in", response_model=TicketCheckInResult)
+def check_in_ticket(
+    ticket_number: str,
+    payload: TicketCheckInRequest,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> TicketCheckInResult:
+    """Admit a guest at the door. Idempotent: a second call on an already
+    checked-in ticket does not error — it returns the ticket with
+    ``checked_in_now=False`` so the scanner can warn "already admitted".
+
+    When ``token`` is supplied (QR scan) it must verify; manual name-search
+    check-in by an authenticated admin omits it.
+    """
+    if payload.token is not None and not verify_ticket_token(ticket_number, payload.token):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid ticket token")
+    ticket = session.scalar(select(Ticket).where(Ticket.ticket_number == ticket_number))
+    if ticket is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
+    if ticket.checked_in:
+        return TicketCheckInResult(ticket=TicketOut.model_validate(ticket), checked_in_now=False)
+    ticket.checked_in = True
+    ticket.checked_in_at = datetime.now(timezone.utc)
+    session.commit()
+    session.refresh(ticket)
+    return TicketCheckInResult(ticket=TicketOut.model_validate(ticket), checked_in_now=True)
+
+
+@router.post("/tickets/{ticket_number}/resend-email", response_model=TicketOut)
+def resend_ticket_email(
+    ticket_number: str,
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> TicketOut:
+    """Re-send a guest's ticket PDF by email. Requires SMTP to be configured."""
+    ticket = session.scalar(select(Ticket).where(Ticket.ticket_number == ticket_number))
+    if ticket is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
+    if not mailer_is_configured():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is not configured on the server (set SMTP_HOST/SMTP_USER/SMTP_PASSWORD).",
+        )
+    send_ticket_email(ticket.id)  # own session; sets email_sent on success, logs on failure
+    session.refresh(ticket)
+    return ticket
+
+
+@router.get("/tickets/export/csv")
+def export_tickets_csv(
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> StreamingResponse:
+    """Guest list as CSV: booking details plus check-in status."""
+    tickets = session.scalars(select(Ticket).order_by(Ticket.ticket_number)).all()
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    _safe_writerow(
+        writer,
+        ["ticket_number", "first_name", "last_name", "email", "location",
+         "email_sent", "checked_in", "checked_in_at", "booked_at"],
+    )
+    for t in tickets:
+        _safe_writerow(writer, [
+            t.ticket_number, t.first_name, t.last_name, t.email, t.location,
+            "Yes" if t.email_sent else "No",
+            "Yes" if t.checked_in else "No",
+            t.checked_in_at.isoformat() if t.checked_in_at else "",
+            t.created_at.isoformat(),
+        ])
+    buffer.seek(0)
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=tickets.csv"},
+    )
 
 
 # --- Status (admin only) ------------------------------------------------------

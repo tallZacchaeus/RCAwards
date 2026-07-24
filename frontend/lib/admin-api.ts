@@ -118,7 +118,14 @@ export type TicketOut = {
   email: string;
   location: string;
   email_sent: boolean;
+  checked_in: boolean;
+  checked_in_at: string | null;
   created_at: string;
+};
+
+export type TicketCheckInResult = {
+  ticket: TicketOut;
+  checked_in_now: boolean;
 };
 
 export type CategoryStat = {
@@ -250,8 +257,32 @@ export async function updateSettings(
   );
 }
 
-export async function listTickets(): Promise<TicketOut[]> {
-  return json(await adminFetch(`/admin/tickets`));
+export async function listTickets(q?: string): Promise<TicketOut[]> {
+  const qs = q && q.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
+  return json(await adminFetch(`/admin/tickets${qs}`));
+}
+
+/** Check a guest in at the door. Pass `token` when it came from a scanned QR
+ *  (the backend re-verifies it); omit it for manual name-search check-in. */
+export async function checkInTicket(
+  ticketNumber: string,
+  token?: string,
+): Promise<TicketCheckInResult> {
+  return json(
+    await adminFetch(`/admin/tickets/${encodeURIComponent(ticketNumber)}/check-in`, {
+      method: "POST",
+      body: JSON.stringify({ token: token ?? null }),
+    }),
+  );
+}
+
+/** Re-send a guest's ticket PDF by email. Throws if SMTP is unconfigured. */
+export async function resendTicketEmail(ticketNumber: string): Promise<TicketOut> {
+  return json(
+    await adminFetch(`/admin/tickets/${encodeURIComponent(ticketNumber)}/resend-email`, {
+      method: "POST",
+    }),
+  );
 }
 
 async function downloadBlob(res: Response, filename: string): Promise<void> {
@@ -263,6 +294,11 @@ async function downloadBlob(res: Response, filename: string): Promise<void> {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/** Download the full guest list (with check-in status) as CSV. */
+export async function downloadTicketsCsv(): Promise<void> {
+  await downloadBlob(await adminFetch(`/admin/tickets/export/csv`), `tickets.csv`);
 }
 
 export async function downloadCsv(category?: string): Promise<void> {

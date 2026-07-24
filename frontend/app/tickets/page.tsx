@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTicketAvailability, bookTicket } from "@/lib/api";
+import { getTicketAvailability, bookTicket, ticketPdfUrl, type TicketCreated } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,8 +14,9 @@ import { EVENT } from "@/lib/site";
 export default function TicketsPage() {
   const [available, setAvailable] = useState(false);
   const [remaining, setRemaining] = useState(0);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [booked, setBooked] = useState<TicketCreated | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -29,6 +30,7 @@ export default function TicketsPage() {
       .then((availability) => {
         setAvailable(availability.available);
         setRemaining(availability.remaining);
+        setTotal(availability.total);
       })
       .catch(() => {
         setError("Could not load ticket availability. Please try again later.");
@@ -49,9 +51,7 @@ export default function TicketsPage() {
         location,
         website,
       });
-      setSuccess(
-        `Your ticket is reserved! Your ticket number is ${result.ticket_number}. Check your inbox for the PDF confirmation.`
-      );
+      setBooked(result);
       setFirstName("");
       setLastName("");
       setEmail("");
@@ -92,10 +92,25 @@ export default function TicketsPage() {
             )}
           </header>
 
-          {success ? (
+          {booked ? (
             <div className="rounded-3xl border border-gold/20 bg-gold/10 p-8 text-ink">
               <p className="font-serif text-xl text-ink">ticket confirmed</p>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-muted">{success}</p>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-muted">
+                Your ticket is reserved! Your ticket number is{" "}
+                <span className="font-semibold text-ink">{booked.ticket_number}</span>. We&apos;ve
+                emailed your PDF confirmation to {booked.email} — if it doesn&apos;t arrive, download
+                it below and keep it for entry.
+              </p>
+              <a
+                href={ticketPdfUrl(booked.ticket_number, booked.token)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-block"
+              >
+                <Button type="button" className="px-6 py-3 text-base">
+                  Download your ticket (PDF)
+                </Button>
+              </a>
             </div>
           ) : (
             <section className="rounded-[2.5rem] border border-line/50 bg-bg-raised/70 p-8 shadow-[0_35px_120px_-50px_rgba(0,0,0,0.6)] sm:p-10">
@@ -107,7 +122,7 @@ export default function TicketsPage() {
                       <div className="flex flex-col gap-2">
                         <span className="font-serif text-xl text-ink">Your details</span>
                         <p className="text-sm text-ink-muted">
-                          Enter your details to reserve one of the 305 awards tickets and receive your PDF pass.
+                          Enter your details to reserve {total > 0 ? `one of the ${total}` : "an"} awards {total === 1 ? "ticket" : "tickets"} and receive your PDF pass.
                         </p>
                       </div>
                     </div>
