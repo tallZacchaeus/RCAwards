@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, Trophy, Star, Settings, BarChart3, LogOut } from "lucide-react";
+import { ClipboardList, Trophy, Star, Settings, BarChart3, Layers, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,7 @@ const NAV = [
   { label: "Nominations", href: "/admin/nominations", icon: ClipboardList, adminOnly: false },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3, adminOnly: true },
   { label: "Leaderboard", href: "/admin/leaderboard", icon: Trophy, adminOnly: false },
+  { label: "Tickets", href: "/admin/tickets", icon: Layers, adminOnly: true },
   { label: "Nominees", href: "/admin/nominees", icon: Star, adminOnly: true },
   { label: "Settings", href: "/admin/settings", icon: Settings, adminOnly: true },
 ];

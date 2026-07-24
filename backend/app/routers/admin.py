@@ -19,6 +19,7 @@ from ..models import (
     Nominee,
     Score,
     Setting,
+    Ticket,
     User,
     UserRole,
     Vote,
@@ -43,6 +44,7 @@ from ..schemas.api import (
     SettingsOut,
     SettingsUpdate,
     StatusUpdate,
+    TicketOut,
     UserCreate,
     UserOut,
     UserUpdate,
@@ -109,6 +111,15 @@ def get_nomination(
         answers=nomination.answers,
         files=[FileRef(field_key=f.field_key, url=f.url, kind=f.kind) for f in nomination.files],
     )
+
+
+@router.get("/tickets", response_model=list[TicketOut])
+def list_tickets(
+    session: Session = Depends(get_session),
+    _: User = Depends(require_admin),
+) -> list[TicketOut]:
+    tickets = session.scalars(select(Ticket).order_by(Ticket.created_at.desc())).all()
+    return tickets
 
 
 # --- Status (admin only) ------------------------------------------------------

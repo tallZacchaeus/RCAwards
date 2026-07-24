@@ -64,6 +64,44 @@ class SignupResult(BaseModel):
     subscribed: bool
 
 
+class TicketAvailability(BaseModel):
+    available: bool
+    remaining: int
+    total: int
+
+
+class TicketCreate(BaseModel):
+    first_name: str = Field(min_length=1, max_length=120)
+    last_name: str = Field(min_length=1, max_length=120)
+    email: EmailStr
+    location: str = Field(min_length=1, max_length=200)
+    website: str = ""  # honeypot — must stay empty
+
+
+class TicketCreated(BaseModel):
+    id: int
+    ticket_number: str
+    first_name: str
+    last_name: str
+    email: EmailStr
+    location: str
+    created_at: datetime
+
+
+class TicketOut(BaseModel):
+    id: int
+    ticket_number: str
+    ticket_type: str
+    first_name: str
+    last_name: str
+    email: str
+    location: str
+    email_sent: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 # --- Auth ---------------------------------------------------------------------
 
 class TokenResponse(BaseModel):
